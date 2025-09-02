@@ -29,6 +29,7 @@ export type SellerDTO = {
   company_name?: string | null;
   vat_number?: string | null;
   tax_office?: string | null;
+  reward_points?: number | null
 };
 
 export type SellerWithPayoutAccountDTO = SellerDTO & {

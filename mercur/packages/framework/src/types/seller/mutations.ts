@@ -17,6 +17,7 @@ export interface CreateSellerDTO
   company_name?: string
   vat_number?: string
   tax_office?: string
+  reward_points?: number // default 0 από DB
 }
 
 
@@ -36,6 +37,7 @@ export interface UpdateSellerDTO {
   handle?: string
   photo?: string
   store_status?: StoreStatus
+  reward_points?: number
 }
 
 export interface CreateMemberDTO {

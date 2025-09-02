@@ -26,6 +26,7 @@ export const Seller = model.define("seller", {
   company_name: model.text().nullable(),
   vat_number: model.text().nullable(),
   tax_office: model.text().nullable(),
+  reward_points: model.number().default(0),
 
   members: model.hasMany(() => Member),
   invites: model.hasMany(() => MemberInvite),

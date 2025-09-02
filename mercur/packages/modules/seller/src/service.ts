@@ -81,6 +81,20 @@ class SellerModuleService extends MedusaService({
   }
 
   @InjectTransactionManager()
+  async addRewardPoints(
+    sellerId: string,
+    delta = 5,
+    @MedusaContext() sharedContext: Context = {}
+  ): Promise<number> {
+    const seller = await this.retrieveSeller(sellerId, { select: ["id", "reward_points"] })
+
+    const current = Number(seller.reward_points ?? 0)
+    const next = current + delta
+
+    await this.updateSellers({ id: sellerId, reward_points: next }, sharedContext)
+    return next
+  }
+
   // @ts-expect-error: createInvites method already exists
   async createMemberInvites(
     input: CreateInviteDTO | CreateInviteDTO[],
