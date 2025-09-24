@@ -48,46 +48,24 @@ DATABASE_URL=postgres://postgres:postgres@localhost:5432/mercur_db
 Also, `.env` file is in Refashion init folder, and you can just copy paste in mercur/apps/backend - just check ips and DATABASE etc codes...
 
 
-Start PostgreSQL via Docker:
-
+Start PostgreSQL via Docker (Pull and run the uploaded image):
 ```bash
-docker run --name mercur-postgres \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=mercur_db \
-  -p 5432:5432 \
-  -d ghcr.io/emmanuelpintelas/refashion-devdb:latest
-```
-of via PowerShell for Windows:
-```bash
+docker pull ghcr.io/emmanuelpintelas/refashion-devdb:latest
 docker run --name mercur-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=mercur_db -p 5432:5432 -d ghcr.io/emmanuelpintelas/refashion-devdb:latest
-
-
-```
-If the container already exists (from a previous setup), just start it again:
-```bash
-docker start mercur-postgres
 ```
 
-Run migrations:
+
+
+Optional: create an admin user only if your seed does not include one:
 
 ```bash
-yarn medusa db:migrate
-```
-and seed to have an initial admin market setuped:
-```bash
-yarn run seed
+npx medusa user --email .... --password ...
 ```
 
-Create admin user:
+Run the backend:
 
 ```bash
-npx medusa user --email manolis_pintelas@hotmail.com --password 123
-```
-
-Start backend:
-
-```bash
+cd mercur/apps/backend
 yarn dev
 ```
 
