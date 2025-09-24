@@ -52,14 +52,17 @@ Start PostgreSQL via Docker:
 
 ```bash
 docker run --name mercur-postgres \
-  -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
   -e POSTGRES_DB=mercur_db \
-  -p 5432:5432 -d postgres:15
+  -p 5432:5432 \
+  -d ghcr.io/emmanuelpintelas/refashion-devdb:latest
 ```
 of via PowerShell for Windows:
 ```bash
-docker run --name mercur-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=mercur_db -p 5432:5432 -d postgres:15
+docker run --name mercur-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=mercur_db -p 5432:5432 -d ghcr.io/emmanuelpintelas/refashion-devdb:latest
+
+
 ```
 If the container already exists (from a previous setup), just start it again:
 ```bash
