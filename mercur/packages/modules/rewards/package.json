@@ -1,0 +1,12 @@
+{
+  "name": "@mercurjs/rewards",
+  "version": "0.1.0",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": { "build": "tsc -p tsconfig.json" },
+  "dependencies": {
+    "@medusajs/framework": "^2.0.0",
+    "pg": "^8.11.3"
+  }
+}

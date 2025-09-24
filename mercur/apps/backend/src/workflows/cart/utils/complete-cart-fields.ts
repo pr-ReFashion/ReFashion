@@ -68,5 +68,15 @@ export const completeCartFields = [
   'items.variant.inventory_items.inventory.location_levels.stock_locations.id',
   'items.variant.inventory_items.inventory.location_levels.stock_locations.name',
   'items.variant.inventory_items.inventory.location_levels.stock_locations.sales_channels.id',
-  'items.variant.inventory_items.inventory.location_levels.stock_locations.sales_channels.name'
+  'items.variant.inventory_items.inventory.location_levels.stock_locations.sales_channels.name',
+  'payment_collection_id', 
+  'payment_collection.id',
+  'payment_collection.amount',
+  'payment_collection.currency_code',
+  'payment_collection.status',
+  'payment_collection.payment_sessions.id',
+  'payment_collection.payment_sessions.status',
+  'payment_collection.payment_sessions.provider_id',
+  'payment_collection.payment_sessions.amount',
+  'payment_collection.payment_sessions.currency_code',
 ]

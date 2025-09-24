@@ -1,23 +1,20 @@
-import { MedusaRequest, MedusaResponse } from '@medusajs/framework/http'
-
-import { splitAndCompleteCartWorkflow } from '../../../../../workflows/cart/workflows'
-import { getFormattedOrderSetListWorkflow } from '../../../../../workflows/order-set/workflows'
+import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
+// ΚΑΤΕΥΘΕΙΑΝ από το νέο αρχείο
+import { splitAndCompleteCartWorkflowBypass } from "../../../../../workflows/cart/workflows/split-and-complete-cart-bypass"
+import { getFormattedOrderSetListWorkflow } from "../../../../../workflows/order-set/workflows"
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
-  const cart_id = req.params.id
+  const cartId = req.params.id
+  console.log("[ROUTE COMPLETE] using SCC BYPASS for", cartId)
 
-  const { result } = await splitAndCompleteCartWorkflow(req.scope).run({
-    input: { id: cart_id },
-    context: { transactionId: cart_id }
+  const { result } = await splitAndCompleteCartWorkflowBypass(req.scope).run({
+    input: { id: cartId },
+    context: { transactionId: cartId },
   })
 
-  const {
-    result: { data }
-  } = await getFormattedOrderSetListWorkflow(req.scope).run({
-    input: { filters: { id: result.id } }
+  const { result: { data } } = await getFormattedOrderSetListWorkflow(req.scope).run({
+    input: { filters: { id: result.id } },
   })
 
-  res.json({
-    order_set: data[0]
-  })
+  return res.json({ order_set: data[0] })
 }

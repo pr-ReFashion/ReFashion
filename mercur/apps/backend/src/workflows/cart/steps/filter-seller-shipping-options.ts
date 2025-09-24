@@ -1,7 +1,7 @@
 import { ShippingOptionDTO } from '@medusajs/framework/types'
 import {
   ContainerRegistrationKeys,
-  arrayDifference
+  arrayDifference,
 } from '@medusajs/framework/utils'
 import { StepResponse, createStep } from '@medusajs/framework/workflows-sdk'
 
@@ -11,70 +11,81 @@ import sellerShippingOption from '../../../links/seller-shipping-option'
 export const filterSellerShippingOptionsStep = createStep(
   'filter-seller-shipping-options',
   async (
-    input: { shipping_options: ShippingOptionDTO[]; cart_id: string },
+    input: { shipping_options?: ShippingOptionDTO[]; cart_id: string },
     { container }
   ) => {
     const query = container.resolve(ContainerRegistrationKeys.QUERY)
 
-    const {
-      data: [cart]
-    } = await query.graph({
+    // 1) Cart (safe)
+    const { data: carts = [] } = await query.graph({
       entity: 'cart',
       fields: ['items.product_id', 'shipping_methods.shipping_option_id'],
-      filters: {
-        id: input.cart_id
-      }
+      filters: { id: input.cart_id },
     })
+    const cart = carts[0] ?? { items: [], shipping_methods: [] }
+    const items = Array.isArray(cart.items) ? cart.items : []
+    const existing = Array.isArray(cart.shipping_methods) ? cart.shipping_methods : []
 
-    const { data: sellersInCart } = await query.graph({
+    // 2) Sellers in cart
+    const { data: sellersInCart = [] } = await query.graph({
       entity: sellerProduct.entryPoint,
       fields: ['seller_id'],
-      filters: {
-        product_id: cart.items.map((i) => i.product_id)
-      }
+      filters: { product_id: items.map((i: any) => i?.product_id).filter(Boolean) },
     })
 
-    const existingShippingOptions = cart.shipping_methods.map(
-      (sm) => sm.shipping_option_id
-    )
+    const existingShippingOptions = existing
+      .map((sm: any) => sm?.shipping_option_id)
+      .filter(Boolean)
 
-    const { data: sellersAlreadyCovered } = await query.graph({
+    const { data: sellersAlreadyCovered = [] } = await query.graph({
       entity: sellerShippingOption.entryPoint,
       fields: ['seller_id'],
-      filters: {
-        shipping_option_id: existingShippingOptions
-      }
+      filters: { shipping_option_id: existingShippingOptions },
     })
 
     const sellersToFindShippingOptions = arrayDifference(
-      [...new Set(sellersInCart.map((s) => s.seller_id))],
-      [...new Set(sellersAlreadyCovered.map((s) => s.seller_id))]
+      [...new Set(sellersInCart.map((s: any) => s?.seller_id).filter(Boolean))],
+      [...new Set(sellersAlreadyCovered.map((s: any) => s?.seller_id).filter(Boolean))]
     )
 
-    const { data: sellerShippingOptions } = await query.graph({
+    // 3) Seller ↔ ShippingOption relations (safe filters)
+    const { data: sellerShippingOptions = [] } = await query.graph({
       entity: sellerShippingOption.entryPoint,
       fields: ['shipping_option_id', 'seller.name', 'seller.id'],
-      filters: {
-        seller_id: sellersToFindShippingOptions
-      }
+      // αν είναι κενό, μη βάλεις filter για να μην πετάει error
+      filters: sellersToFindShippingOptions.length
+        ? { seller_id: sellersToFindShippingOptions }
+        : {},
     })
 
-    const applicableShippingOptions = sellerShippingOptions.map(
-      (so) => so.shipping_option_id
+    const baseOptions = Array.isArray(input?.shipping_options)
+      ? (input!.shipping_options as ShippingOptionDTO[])
+      : []
+
+    // Fallback: αν δεν υπάρχει καθόλου mapping, ΜΗΝ μπλοκάρεις — επέστρεψε ό,τι ήρθε
+    if (!sellerShippingOptions.length) {
+      return new StepResponse(baseOptions)
+    }
+
+    const applicableIds = new Set(
+      sellerShippingOptions
+        .map((so: any) => so?.shipping_option_id)
+        .filter(Boolean)
     )
 
-    const optionsAvailable = input.shipping_options
-      .filter((option) => applicableShippingOptions.includes(option.id))
+    const optionsAvailable = baseOptions
+      .filter((option) => applicableIds.has(option.id))
       .map((option) => {
         const relation = sellerShippingOptions.find(
-          (o) => o.shipping_option_id === option.id
+          (o: any) => o?.shipping_option_id === option.id
         )
         return {
           ...option,
-          seller_name: relation.seller.name,
-          seller_id: relation.seller.id
+          seller_name: relation?.seller?.name ?? null,
+          seller_id: relation?.seller?.id ?? null,
         }
       })
+
     return new StepResponse(optionsAvailable)
   }
 )

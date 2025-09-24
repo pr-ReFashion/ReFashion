@@ -2248,6 +2248,36 @@
     zod "3.22.4"
     zod-validation-error "^3.4.1"
 
+"@medusajs/framework@^2.0.0":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/framework/-/framework-2.10.3.tgz#91c6af96fdfd31fc1912c07eeb4d1abfc6aed528"
+  integrity sha512-fwAhXbTuN/A1USsvlAnWeP8waOf4BADTYBCcM+thMaXB/83kKJa3OQrpiHfRsrDRnEf89JIp7hrNQCyC8ilRQA==
+  dependencies:
+    "@jercle/yargonaut" "^1.1.5"
+    "@medusajs/modules-sdk" "2.10.3"
+    "@medusajs/orchestration" "2.10.3"
+    "@medusajs/telemetry" "2.10.3"
+    "@medusajs/types" "2.10.3"
+    "@medusajs/utils" "2.10.3"
+    "@medusajs/workflows-sdk" "2.10.3"
+    "@opentelemetry/api" "^1.9.0"
+    "@types/express" "^4.17.17"
+    chokidar "^3.4.2"
+    compression "1.8.0"
+    connect-redis "5.2.0"
+    cookie-parser "^1.4.6"
+    cors "^2.8.5"
+    express "^4.21.0"
+    express-session "^1.17.3"
+    glob "10.4.5"
+    jsonwebtoken "^9.0.2"
+    lodash "4.17.21"
+    morgan "^1.9.1"
+    path-to-regexp "^0.1.10"
+    tsconfig-paths "^4.2.0"
+    zod "3.25.76"
+    zod-validation-error "3.5.1"
+
 "@medusajs/fulfillment-manual@2.8.6":
   version "2.8.6"
   resolved "https://registry.yarnpkg.com/@medusajs/fulfillment-manual/-/fulfillment-manual-2.8.6.tgz#5368d3ae30bd196f7b707d066f5002ab01af645f"
@@ -2392,6 +2422,15 @@
     uuid "^9.0.0"
     zod "3.22.4"
 
+"@medusajs/modules-sdk@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/modules-sdk/-/modules-sdk-2.10.3.tgz#badfdcaeeb0162f9860f0ade642c4ab87e6efd99"
+  integrity sha512-4KYUVQc0CSstpyijZNgkUxO9prZC2rsVKTP6615KpguAli9K36dxN3IVp0XxuxXocJ2ZG0Yi8ec3HeN6+W6wJw==
+  dependencies:
+    "@medusajs/orchestration" "2.10.3"
+    "@medusajs/types" "2.10.3"
+    "@medusajs/utils" "2.10.3"
+
 "@medusajs/modules-sdk@2.8.6":
   version "2.8.6"
   resolved "https://registry.yarnpkg.com/@medusajs/modules-sdk/-/modules-sdk-2.8.6.tgz#9928ffab52e6e9ff083ae460f5cc1b38b4b3c6e4"
@@ -2417,6 +2456,15 @@
   version "2.8.6"
   resolved "https://registry.yarnpkg.com/@medusajs/notification/-/notification-2.8.6.tgz#d946d189234236f69e12c12126991b9cdead0241"
   integrity sha512-bjlyX6CldHn/UmJT/aT/KH/26xiGuF4qtOQgMsDY1cVRR1m9tiAdLepUZMlN9InXeamvbPvhL1lAEY/+SMkLXA==
+
+"@medusajs/orchestration@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/orchestration/-/orchestration-2.10.3.tgz#dfba9e99b8279db96e6e5de7c09cdad59e85046d"
+  integrity sha512-2nbpVefyovNX4j8M+jaT73FcJnHsCHkJAfU3OZRoEMd2jq7hKrM17nqeEn5B86xbvSjjOkP8rtqJboVGVuUyxg==
+  dependencies:
+    "@medusajs/types" "2.10.3"
+    "@medusajs/utils" "2.10.3"
+    ulid "^2.3.0"
 
 "@medusajs/orchestration@2.8.6":
   version "2.8.6"
@@ -2484,6 +2532,22 @@
   resolved "https://registry.yarnpkg.com/@medusajs/tax/-/tax-2.8.6.tgz#9f146b1e0208455f05e3d17eeef81871c2aa0c3a"
   integrity sha512-OFKA5NoFYj9m7L2BYkha5dY2gzUJlcYCsd9GwbEd8f2+2WJL0VALPB5eecpbDuI4ygAbvDDa3QoQfkbZ7/NrsA==
 
+"@medusajs/telemetry@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/telemetry/-/telemetry-2.10.3.tgz#5342ffdd39efc8f7d05a57f82e2d664829189621"
+  integrity sha512-5LuvX5Be+UuzAAW0OvvRysxvwsxu/BRRptvCMrBe9osh/5STZJDfzPyXkAjizzrFveXoa0tdbKTGd4nq91VKdQ==
+  dependencies:
+    "@babel/runtime" "^7.22.10"
+    axios "^0.21.4"
+    axios-retry "^3.1.9"
+    boxen "^5.0.1"
+    ci-info "^3.2.0"
+    configstore "5.0.1"
+    global "^4.4.0"
+    is-docker "^2.2.1"
+    remove-trailing-slash "^0.1.1"
+    uuid "^8.3.2"
+
 "@medusajs/telemetry@2.8.6":
   version "2.8.6"
   resolved "https://registry.yarnpkg.com/@medusajs/telemetry/-/telemetry-2.8.6.tgz#7d8e03ae41d4ba05396645cfaa17dba0a36f51dc"
@@ -2510,6 +2574,13 @@
     express "^4.21.0"
     get-port "^5.1.0"
     randomatic "^3.1.1"
+
+"@medusajs/types@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/types/-/types-2.10.3.tgz#27eb675a04bdd99dc65c65916af3178d772e85df"
+  integrity sha512-Rx1H4LZ17AsOspaFAPpMwpi2rxj14ZWSip+1FA28GZourviWCLR2i3Er0b6SqJdh861fH6RhSyNaYVEKX6rk/w==
+  dependencies:
+    bignumber.js "^9.1.2"
 
 "@medusajs/types@2.8.6":
   version "2.8.6"
@@ -2543,6 +2614,27 @@
   integrity sha512-31yO/qaY4y4TIeTvnl+/xmv1iv1HBQ23UNU5Uur325rj2AITtT+gfTOZzUidFpnBoiBM5ELwbAcykSRejzTygg==
   dependencies:
     jsonwebtoken "^9.0.2"
+
+"@medusajs/utils@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/utils/-/utils-2.10.3.tgz#befd70cf6e5c8095d7c4dd6026264ce05b056dd3"
+  integrity sha512-suct9AGHYnvT2ssu8nwZvZjuNRkhUdHCG0jGGn2vcANfh3d7qJNwMxXoUXztNHa0MirUpgmtBoUMKPgCrMW8uA==
+  dependencies:
+    "@graphql-codegen/core" "^4.0.2"
+    "@graphql-codegen/typescript" "^4.0.9"
+    "@graphql-tools/merge" "^9.0.7"
+    "@graphql-tools/schema" "^10.0.6"
+    "@medusajs/types" "2.10.3"
+    "@types/pluralize" "^0.0.33"
+    bignumber.js "^9.1.2"
+    dotenv "^16.4.5"
+    dotenv-expand "^11.0.6"
+    graphql "^16.9.0"
+    jsonwebtoken "^9.0.2"
+    pg-connection-string "^2.7.0"
+    pluralize "^8.0.0"
+    ulid "^2.3.0"
+    zod "3.25.76"
 
 "@medusajs/utils@2.8.6":
   version "2.8.6"
@@ -2580,6 +2672,17 @@
   dependencies:
     bullmq "5.13.0"
     ioredis "^5.4.1"
+    ulid "^2.3.0"
+
+"@medusajs/workflows-sdk@2.10.3":
+  version "2.10.3"
+  resolved "https://registry.yarnpkg.com/@medusajs/workflows-sdk/-/workflows-sdk-2.10.3.tgz#0e4dc1fde6039ce697081387af07753e8d010317"
+  integrity sha512-4bS14KBygY5GA/mNvzakOqJIdrFqT/nTi8w0j7vT4ZYlOHY9EWL3cJ/PyctTPl2P7/cynz3qTi/lvlnnhFvtmQ==
+  dependencies:
+    "@medusajs/modules-sdk" "2.10.3"
+    "@medusajs/orchestration" "2.10.3"
+    "@medusajs/types" "2.10.3"
+    "@medusajs/utils" "2.10.3"
     ulid "^2.3.0"
 
 "@medusajs/workflows-sdk@2.8.6":
@@ -7305,7 +7408,7 @@ compression@1.7.4:
     safe-buffer "5.1.2"
     vary "~1.1.2"
 
-compression@^1.7.4, compression@^1.7.5:
+compression@1.8.0, compression@^1.7.4, compression@^1.7.5:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/compression/-/compression-1.8.0.tgz#09420efc96e11a0f44f3a558de59e321364180f7"
   integrity sha512-k6WLKfunuqCYD3t6AsuPGvQWaKwuLLh2/xHNcX4qE+vIfDNXpSqnrhwA7O53R7WVQUnt8dVAIW+YHr7xTgOgGA==
@@ -13830,6 +13933,11 @@ yoctocolors-cjs@^2.1.2:
   resolved "https://registry.npmjs.org/yoctocolors-cjs/-/yoctocolors-cjs-2.1.2.tgz"
   integrity sha512-cYVsTjKl8b+FrnidjibDWskAv7UKOfcwaVZdp/it9n1s9fU3IkgDbhdIRKCW4JDsAlECJY0ytoVPT3sK6kideA==
 
+zod-validation-error@3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/zod-validation-error/-/zod-validation-error-3.5.1.tgz#5d6044a2ecad74202d155ca58e4fa0eebbe143bb"
+  integrity sha512-ozT8jy2nHaeKjaRIEThwgRXBwm16hAy0BaTRx1I2IY1xrezPegmlFmYKb5tcvYqZDQm0sfZtDr2IR7CdCJzTGw==
+
 zod-validation-error@^3.4.1:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/zod-validation-error/-/zod-validation-error-3.5.2.tgz#5af463c1acd4662e6b2610a75260931dbcb43a56"
@@ -13839,3 +13947,8 @@ zod@3.22.4:
   version "3.22.4"
   resolved "https://registry.npmjs.org/zod/-/zod-3.22.4.tgz"
   integrity sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==
+
+zod@3.25.76:
+  version "3.25.76"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-3.25.76.tgz#26841c3f6fd22a6a2760e7ccb719179768471e34"
+  integrity sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==
