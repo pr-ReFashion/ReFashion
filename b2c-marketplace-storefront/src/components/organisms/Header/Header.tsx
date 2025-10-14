@@ -19,10 +19,13 @@ import { Badge } from "@/components/atoms"
 import CountrySelector from "@/components/molecules/CountrySelector/CountrySelector"
 import { listRegions } from "@/lib/data/regions"
 import LocalizedClientLink from "@/components/molecules/LocalizedLink/LocalizedLink"
+import { SellNowButton } from "@/components/cells/SellNowButton/SellNowButton"
 
 export const Header = async () => {
   const cart = await retrieveCart().catch(() => null)
   const user = await retrieveCustomer()
+  const customer = await retrieveCustomer().catch(() => null)  // ← check login
+
   let wishlist: Wishlist[] = []
   if (user) {
     const response = await getUserWishlists()
@@ -49,7 +52,10 @@ export const Header = async () => {
             childrenCategories={categories}
           />
           <HeadingCategories categories={parentCategories} />
-        </div>
+          {customer && (
+            <SellNowButton />
+          )}
+          </div>
         <div className="flex lg:justify-center lg:w-1/3 items-center pl-4 lg:pl-0">
           <LocalizedClientLink href="/" className="text-2xl font-bold">
             <Image

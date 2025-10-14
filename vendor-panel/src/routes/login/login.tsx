@@ -11,6 +11,39 @@ import { useDashboardExtension } from "../../extensions"
 import { useSignInWithEmailPass } from "../../hooks/api"
 import { isFetchError } from "../../lib/is-fetch-error"
 
+// --- Bootstrap: read seller_token_js -> store -> clear ---
+function readCookie(name: string) {
+  return document.cookie
+      .split("; ")
+      .find((r) => r.startsWith(name + "="))
+      ?.split("=")[1]
+}
+
+function bootstrapSellerAuthFromCookie() {
+  try {
+    const token = readCookie("seller_token_js")
+    if (token) {
+      console.warn("tokenIn the Vendor : ", token)
+      // Persist for API calls from vendor-panel
+      localStorage.setItem("medusa_auth_token", token)
+      // Optional cleanup: remove the readable cookie in the browser
+      document.cookie = "seller_token_js=; Max-Age=0; path=/"
+    }
+  } catch (e) {
+    console.warn("Bootstrap seller auth failed:", e)
+  }
+}
+
+// Run BEFORE rendering the app
+bootstrapSellerAuthFromCookie()
+
+
+
+
+
+
+
+
 const LoginSchema = z.object({
   email: z.string().email(),
   password: z.string(),

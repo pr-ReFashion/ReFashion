@@ -73,7 +73,7 @@ const SellerRequestsPage = () => {
               return (
                 <Table.Row key={request.id}>
                   <Table.Cell>{requestData.seller.name}</Table.Cell>
-                  <Table.Cell>{requestData.provider_identity_id}</Table.Cell>
+                  <Table.Cell>{requestData.provider_identity_id.replace(/\.refashion$/, "")}</Table.Cell>
                   <Table.Cell>
                     <div className="flex items-center gap-2">
                       <History />

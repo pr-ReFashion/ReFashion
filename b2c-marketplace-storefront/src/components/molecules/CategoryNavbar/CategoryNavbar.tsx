@@ -16,23 +16,28 @@ export const CategoryNavbar = ({
 
   return (
     <nav className="flex md:items-center flex-col md:flex-row">
+      {/* All Products link */}
       <LocalizedClientLink
         href="/categories"
         onClick={() => (onClose ? onClose(false) : null)}
         className={cn(
-          "label-md uppercase px-4 my-3 md:my-0 flex items-center justify-between"
+          "label-md uppercase px-4 my-3 md:my-0 flex items-center justify-between transition-colors duration-200",
+          "text-black hover:text-[rgb(var(--brand-500))]"
         )}
       >
         All Products
       </LocalizedClientLink>
+
+      {/* Dynamic category links */}
       {categories?.map(({ id, handle, name }) => (
         <LocalizedClientLink
           key={id}
           href={`/categories/${handle}`}
           onClick={() => (onClose ? onClose(false) : null)}
           className={cn(
-            "label-md uppercase px-4 my-3 md:my-0 flex items-center justify-between",
-            handle === category && "md:border-b md:border-primary"
+            "label-md uppercase px-4 my-3 md:my-0 flex items-center justify-between transition-colors duration-200",
+            "text-black hover:text-[rgb(var(--brand-500))]",
+            handle === category && "md:border-b-2 md:border-[rgb(var(--brand-600))]"
           )}
         >
           {name}
@@ -42,3 +47,4 @@ export const CategoryNavbar = ({
     </nav>
   )
 }
+

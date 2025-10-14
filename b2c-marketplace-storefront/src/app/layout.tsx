@@ -10,37 +10,29 @@ const funnelDisplay = Funnel_Display({
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | ${
-      process.env.NEXT_PUBLIC_SITE_NAME ||
-      "Mercur B2C Demo - Marketplace Storefront"
-    }`,
-    default:
-      process.env.NEXT_PUBLIC_SITE_NAME ||
-      "Mercur B2C Demo - Marketplace Storefront",
+    template: `%s | ReFashion - Sustainable Fashion Marketplace`,
+    default: `ReFashion - Sustainable Fashion Marketplace`,
   },
-  description:
-    process.env.NEXT_PUBLIC_SITE_DESCRIPTION ||
-    "Mercur B2C Demo - Marketplace Storefront",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
-  ),
+  description: "Buy and sell second-hand fashion sustainably",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
 }
 
+
 export default async function RootLayout({
-  children,
-  params,
-}: Readonly<{
+                                           children,
+                                           params,
+                                         }: Readonly<{
   children: React.ReactNode
   params: Promise<{ locale: string }>
 }>) {
   const { locale } = await params
   return (
-    <html lang={locale} className="">
+      <html lang={locale} className="">
       <body
-        className={`${funnelDisplay.className} antialiased bg-primary text-secondary`}
+          className={`${funnelDisplay.className} antialiased bg-primary text-secondary`}
       >
-        {children}
+      {children}
       </body>
-    </html>
+      </html>
   )
 }

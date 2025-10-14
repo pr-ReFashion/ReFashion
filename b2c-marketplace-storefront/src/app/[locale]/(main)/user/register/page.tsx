@@ -8,6 +8,11 @@ export default async function Page() {
   if (user) {
     redirect("/user")
   }
-
-  return <RegisterForm />
+  return (
+      <div className="py-10">
+        <div className="mx-auto w-full max-w-xl md:max-w-2xl">
+          <RegisterForm />
+        </div>
+      </div>
+  )
 }

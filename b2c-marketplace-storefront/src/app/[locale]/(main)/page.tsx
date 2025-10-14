@@ -9,25 +9,27 @@ import {
   ShopByStyleSection,
 } from "@/components/sections"
 
+
+
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
   title: "Home",
   description:
-    "Welcome to Mercur B2C Demo! Create a modern marketplace that you own and customize in every aspect with high-performance, fully customizable storefront.",
+    "Welcome to Refashion B2C Demo! Create a modern marketplace that you own and customize in every aspect with high-performance, fully customizable storefront.",
   openGraph: {
-    title: "Mercur B2C Demo - Marketplace Storefront",
+    title: "Refashion B2C Demo - Marketplace Storefront",
     description:
-      "Welcome to Mercur B2C Demo! Create a modern marketplace that you own and customize in every aspect with high-performance, fully customizable storefront.",
+      "Welcome to Refashion B2C Demo! Create a modern marketplace that you own and customize in every aspect with high-performance, fully customizable storefront.",
     url: process.env.NEXT_PUBLIC_BASE_URL,
-    siteName: "Mercur B2C Demo - Marketplace Storefront",
+    siteName: "Refashion B2C Demo - Marketplace Storefront",
     type: "website",
     images: [
       {
         url: "/B2C_Storefront_Open_Graph.png",
         width: 1200,
         height: 630,
-        alt: "Mercur B2C Demo - Marketplace Storefront",
+        alt: "Refashion B2C Demo - Marketplace Storefront",
       },
     ],
   },
@@ -54,7 +56,7 @@ export default async function Home({
             //path:
               // process.env.NEXT_PUBLIC_ALGOLIA_ID === "UO3C5Y8NHX"
               //   ? "https://vendor-sandbox.vercel.app/"
-              //   : "https://vendor.mercurjs.com",
+              //   : "https://vendor.Refashionjs.com",
           },
         ]}
       />

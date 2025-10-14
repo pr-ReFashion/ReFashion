@@ -16,7 +16,7 @@ import {
 import { getRegion } from "./regions"
 
 /**
- * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookies.
+ * Retrieves a cart by its ID. If no ID is provided, it will use the cart ID from the cookiesDebug.
  * @param cartId - optional - The ID of the cart to retrieve.
  * @returns The cart object if found, or null if not found.
  */
@@ -386,7 +386,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
 }
 
 /**
- * Places an order for a cart. If no cart ID is provided, it will use the cart ID from the cookies.
+ * Places an order for a cart. If no cart ID is provided, it will use the cart ID from the cookiesDebug.
  * @param cartId - optional - The ID of the cart to place an order for.
  * @returns The cart object if the order was successful, or null if not.
  */
