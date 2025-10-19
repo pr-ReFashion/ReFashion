@@ -12,7 +12,7 @@
 
 ```
 Refashion/
-├── mercur/                     # Medusa backend
+├── mercur/                     # Refashion backend
 ├── vendor-panel/               # Vendor admin panel
 ├── b2c-marketplace-storefront/ # Customer-facing frontend
 ```
