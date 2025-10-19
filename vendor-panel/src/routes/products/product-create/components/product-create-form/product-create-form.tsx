@@ -13,7 +13,7 @@ import {
   useExtendableForm,
 } from "../../../../../extensions"
 import { useCreateProduct } from "../../../../../hooks/api/products"
-import { uploadFilesQuery } from "../../../../../lib/client"
+import { fetchQuery, uploadFilesQuery } from "../../../../../lib/client"
 import {
   PRODUCT_CREATE_FORM_DEFAULTS,
   ProductCreateSchema,
@@ -22,6 +22,7 @@ import { ProductCreateDetailsForm } from "../product-create-details-form"
 import { ProductCreateInventoryKitForm } from "../product-create-inventory-kit-form"
 import { ProductCreateOrganizeForm } from "../product-create-organize-form"
 import { ProductCreateVariantsForm } from "../product-create-variants-form"
+
 
 enum Tab {
   DETAILS = "details",

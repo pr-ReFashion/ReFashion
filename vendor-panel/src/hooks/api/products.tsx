@@ -20,6 +20,190 @@ import {
 } from "./helpers/productFilters"
 import productsImagesFormatter from "../../utils/products-images-formatter"
 
+/**********************************************************************
+ *                      CUSTOM CODE START
+ **********************************************************************/
+import { inventoryItemLevelsQueryKeys } from "./inventory"
+
+//Seller for the address
+type Seller = {
+  address_line?: string
+  address_line_2?: string
+  city?: string
+  company?: string
+  company_name?: string
+  name?: string
+  country_code?: string        // may be localized (e.g. "Ελλάδα")
+  phone?: string
+  postal_code?: string
+  province?: string
+  state?: string | null
+}
+
+type MeResponse = {
+  member?: {
+    id?: string
+    email?: string
+    role?: string
+    name?: string
+    phone?: string | null
+    photo?: string | null
+    seller?: Seller
+    seller_id?: string
+  }
+}
+
+function normalizeCountry(code?: string) {
+  return (code || "").trim().toUpperCase()
+}
+
+function buildAddressFromSeller(seller?: Seller) {
+  const company =
+    seller?.company ??
+    seller?.company_name ??
+    seller?.name ??
+    "Default"
+
+  return {
+    name: "Default",        // change to company if you prefer
+    address: {
+      address_1:   seller?.address_line      ?? "",
+      address_2:   seller?.address_line_2    ?? "",
+      city:        seller?.city              ?? "",
+      company,
+      country_code: seller?.country_code,
+      phone:        seller?.phone            ?? "",
+      postal_code:  seller?.postal_code      ?? "",
+      province:     seller?.province ?? (seller?.state ?? "") ?? "",
+    },
+  }
+}
+// === Auto stock seeding (vendor endpoints only, NO nested inventory_item populate) ===
+type VariantWithInv = {
+  id: string
+  inventory_items?: Array<{
+    id: string
+    inventory_item_id?: string
+  }>
+}
+
+async function vGET<T = any>(path: string, query?: Record<string, any>): Promise<T> {
+  return await fetchQuery(path, { method: "GET", query: query as any })
+}
+async function vPOST<T = any>(path: string, body?: any): Promise<T> {
+  return await fetchQuery(path, { method: "POST", body })
+}
+
+// 1) Ensure a stock location exists; if not, create one with your fixed data
+async function ensureStockLocationId(): Promise<string | undefined> {
+  // 1) reuse existing (prefer default)
+  const list = await vGET("/vendor/stock-locations")
+  const existingDefault = list?.stock_locations?.find((l: any) => l.is_default)
+  const existingAny = existingDefault?.id || list?.stock_locations?.[0]?.id
+  if (existingAny) return existingAny
+
+  // 2) load /vendor/me and extract seller
+  const me = await vGET<MeResponse>("/vendor/me", undefined, "Load /vendor/me")
+  const seller = me?.member?.seller
+  console.log("[ensureStockLocationId] seller →", seller)
+
+  // 3) build payload from seller
+  const payload = buildAddressFromSeller(seller)
+  console.log("[ensureStockLocationId] creating stock location with payload →", payload)
+
+  const created = await vPOST("/vendor/stock-locations", payload)
+  const locId = created?.stock_location?.id
+  console.log("[ensureStockLocationId] created stock location id:", locId)
+
+  return locId
+}
+
+
+// 2) Get variants including their *attachment* rows (no nested inventory_item!)
+async function getVariantsWithInvItems(productId: string): Promise<VariantWithInv[]> {
+  const res = await vGET(`/vendor/products/${productId}`, {
+    fields: "*variants.inventory_items",
+  })
+  return res?.product?.variants ?? []
+}
+
+// 3) Resolve REAL inventory item id (iitem_*) for a variant
+async function resolveIItemId(variant: VariantWithInv): Promise<string | undefined> {
+  const viaAttachment = variant?.inventory_items?.find(a => a.inventory_item_id)?.inventory_item_id
+  if (viaAttachment) return viaAttachment
+
+  try {
+    const r = await vGET(`/vendor/product-variants/${variant.id}/inventory-items`)
+    const fromVariant = r?.inventory_items?.[0]?.inventory_item_id
+    if (fromVariant) return fromVariant
+  } catch {
+    /* ignore */
+  }
+
+  // Last resort: search inventory items by variant_id
+  try {
+    const q = await vGET("/vendor/inventory-items", { variant_id: variant.id, limit: 1 })
+    const found = q?.inventory_items?.[0]?.id // should be iitem_*
+    if (found) return found
+  } catch {
+    /* ignore */
+  }
+
+  return undefined
+}
+
+// 4) Create/Update the level to qty=1
+//    IMPORTANT: Medusa requires the item to be "stocked" at the location BEFORE updates.
+//    So we ALWAYS batch-create first (if missing), then set quantity via per-location update.
+async function createOrUpdateLevelQty1(iitemId: string, locationId: string) {
+  // 1) If level missing, create it via batch (this "stocks" the item at the location)
+  const levelList = await vGET(`/vendor/inventory-items/${iitemId}/location-levels`)
+  const exists = !!levelList?.location_levels?.some((l: any) => l.location_id === locationId)
+
+  if (!exists) {
+    await vPOST(`/vendor/inventory-items/${iitemId}/location-levels/batch`, {
+      // NOTE: singular keys for Medusa v2-style endpoints
+      create: [{ location_id: locationId, stocked_quantity: 1 }],
+      update: [],
+      delete: [],
+    })
+  }
+
+  // 2) Now it’s stocked there; set (or confirm) qty=1
+  await vPOST(`/vendor/inventory-items/${iitemId}/location-levels/${locationId}`, {
+    stocked_quantity: 1,
+  })
+
+  // 3) Invalidate this item's levels so the UI refreshes
+  try {
+    await queryClient.invalidateQueries({
+      queryKey: inventoryItemLevelsQueryKeys.detail(iitemId),
+    })
+  } catch {}
+}
+
+
+// 4) Main routine called after product creation
+async function seedInitialStock(productId: string) {
+  const locationId = await ensureStockLocationId()
+  if (!locationId) return
+
+  const variants = await getVariantsWithInvItems(productId)
+  for (const v of variants) {
+    const iitemId = await resolveIItemId(v)
+    if (!iitemId) continue
+    await createOrUpdateLevelQty1(iitemId, locationId)
+
+    // Also refresh inventory items lists as a whole
+    await queryClient.invalidateQueries({ queryKey: inventoryItemsQueryKeys.lists() })
+  }
+}
+/**********************************************************************
+ *                         CUSTOM CODE END
+ *********************************************************************/
+
+
+
 const PRODUCTS_QUERY_KEY = "products" as const
 export const productsQueryKeys = queryKeysFactory(PRODUCTS_QUERY_KEY)
 
@@ -477,18 +661,29 @@ export const useCreateProduct = (
         method: "POST",
         body: payload,
       }),
-    onSuccess: (data, variables, context) => {
-      queryClient.invalidateQueries({
-        queryKey: productsQueryKeys.lists(),
-      })
-      queryClient.invalidateQueries({
-        queryKey: inventoryItemsQueryKeys.lists(),
-      })
+    onSuccess: async (data, variables, context) => {
+      // refresh early
+      await queryClient.invalidateQueries({ queryKey: productsQueryKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: inventoryItemsQueryKeys.lists() })
+
+      try {
+        const productId = data?.product?.id
+        if (productId) {
+          await seedInitialStock(productId)
+          // global refresh after seeding
+          await queryClient.invalidateQueries({ queryKey: inventoryItemsQueryKeys.lists() })
+        }
+      } catch {
+        // soft-fail; don't block caller
+      }
+
       options?.onSuccess?.(data, variables, context)
     },
     ...options,
   })
 }
+
+
 
 export const useUpdateProduct = (
   id: string,
