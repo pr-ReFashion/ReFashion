@@ -258,16 +258,14 @@ export async function initiatePaymentSession(
 
 export async function applyPromotions(codes: string[]) {
   const cartId = await getCartId()
-
-  if (!cartId) {
+   if (!cartId) {
     throw new Error("No existing cart found")
   }
 
   const headers = {
     ...(await getAuthHeaders()),
   }
-
-  return sdk.store.cart
+   return sdk.store.cart
     .update(cartId, { promo_codes: codes }, {}, headers)
     .then(async () => {
       const cartCacheTag = await getCacheTag("carts")

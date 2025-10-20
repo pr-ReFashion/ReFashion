@@ -1,24 +1,27 @@
+"use client"
+
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 
-const useUpdateSearchParams = () => {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const pathname = usePathname()
-
-  const updateSearchParams = (field: string, value: string | null) => {
-    const updatedSearchParams = new URLSearchParams(searchParams.toString())
-    if (!value) {
-      updatedSearchParams.delete(field)
-    } else {
-      updatedSearchParams.set(field, value)
-    }
-
-    router.push(`${pathname}?${updatedSearchParams}`, {
-      scroll: false,
-    })
-  }
-
-  return updateSearchParams
+type Opts = {
+    replace?: boolean
 }
 
-export default useUpdateSearchParams
+export default function useUpdateSearchParams() {
+    const router = useRouter()
+    const pathname = usePathname()
+    const sp = useSearchParams()
+
+    return (key: string, value: string | null, opts?: Opts) => {
+        const next = new URLSearchParams(sp.toString()) // preserve everything else
+
+        if (value === null || value === "") {
+            next.delete(key)
+        } else {
+            next.set(key, value)
+        }
+
+        const url = `${pathname}?${next.toString()}`
+        if (opts?.replace) router.replace(url)
+        else router.push(url)
+    }
+}

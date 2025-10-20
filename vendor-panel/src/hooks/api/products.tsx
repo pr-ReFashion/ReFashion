@@ -95,28 +95,90 @@ async function vPOST<T = any>(path: string, body?: any): Promise<T> {
 }
 
 // 1) Ensure a stock location exists; if not, create one with your fixed data
+async function getDefaultSalesChannelId(): Promise<string | undefined> {
+  const res = await vGET("/vendor/sales-channels")
+  return res?.sales_channels?.[0]?.id
+}
+
+async function attachLocationToSalesChannel(locationId: string, channelId: string) {
+  await vPOST(`/vendor/stock-locations/${locationId}/sales-channels`, {
+    add: [channelId],
+  })
+}
+
 async function ensureStockLocationId(): Promise<string | undefined> {
-  // 1) reuse existing (prefer default)
   const list = await vGET("/vendor/stock-locations")
   const existingDefault = list?.stock_locations?.find((l: any) => l.is_default)
   const existingAny = existingDefault?.id || list?.stock_locations?.[0]?.id
-  if (existingAny) return existingAny
 
-  // 2) load /vendor/me and extract seller
+  // ensure an existing location is attached to the sales channel
+  if (existingAny) {
+    const channelId = await getDefaultSalesChannelId()
+    if (channelId) {
+      try {
+        await attachLocationToSalesChannel(existingAny, channelId)
+      } catch { /* ignore if already attached */ }
+    }
+    return existingAny
+  }
+
+  // create from /vendor/me
   const me = await vGET<MeResponse>("/vendor/me", undefined, "Load /vendor/me")
   const seller = me?.member?.seller
-  console.log("[ensureStockLocationId] seller →", seller)
 
-  // 3) build payload from seller
   const payload = buildAddressFromSeller(seller)
-  console.log("[ensureStockLocationId] creating stock location with payload →", payload)
-
   const created = await vPOST("/vendor/stock-locations", payload)
   const locId = created?.stock_location?.id
-  console.log("[ensureStockLocationId] created stock location id:", locId)
+  if (!locId) return undefined
+
+  // 🔗 attach to default sales channel
+  const channelId = await getDefaultSalesChannelId()
+  if (channelId) {
+    try {
+      await attachLocationToSalesChannel(locId, channelId)
+    } catch { /* ignore */ }
+  }
 
   return locId
 }
+// Attach variant -> inventory item WITHOUT relying on GET (vendor API returns 404)
+// Προσπάθησε να κάνεις attach variant -> inventory item.
+// Αν το endpoint δεν υπάρχει (404) ή είναι ήδη συνδεδεμένο (409/400),
+// απλά προχώρα — δεν σταματάμε το seeding.
+async function ensureVariantAttachedToItem(variantId: string, iitemId: string) {
+  try {
+    await vPOST(`/vendor/product-variants/${variantId}/inventory-items`, {
+      inventory_item_id: iitemId,
+      required_quantity: 1,
+    })
+    return
+  } catch (err: any) {
+    const msg = (err?.message || "").toLowerCase()
+    const status = err?.status || err?.code
+
+    // ΔΕΝ σταματάμε για 404 (endpoint δεν υπάρχει στα vendor routes)
+    if (status === 404) {
+      // console.debug("[attach] endpoint not available on vendor API, skipping")
+      return
+    }
+
+    // Αν είναι ήδη συνδεδεμένο ή conflict, επίσης συνεχίζουμε
+    if (
+      status === 409 ||
+      status === 400 ||
+      msg.includes("already") ||
+      msg.includes("exists") ||
+      msg.includes("duplicate")
+    ) {
+      return
+    }
+
+    // Οτιδήποτε άλλο, δείξ’ το για να το δούμε
+    throw err
+  }
+}
+
+
 
 
 // 2) Get variants including their *attachment* rows (no nested inventory_item!)
@@ -129,52 +191,68 @@ async function getVariantsWithInvItems(productId: string): Promise<VariantWithIn
 
 // 3) Resolve REAL inventory item id (iitem_*) for a variant
 async function resolveIItemId(variant: VariantWithInv): Promise<string | undefined> {
+  // 1) try to read the ‘inventory_item_id’ directly from the attachment row we already fetched
   const viaAttachment = variant?.inventory_items?.find(a => a.inventory_item_id)?.inventory_item_id
   if (viaAttachment) return viaAttachment
 
-  try {
-    const r = await vGET(`/vendor/product-variants/${variant.id}/inventory-items`)
-    const fromVariant = r?.inventory_items?.[0]?.inventory_item_id
-    if (fromVariant) return fromVariant
-  } catch {
-    /* ignore */
-  }
-
-  // Last resort: search inventory items by variant_id
+  // 2) last resort: query inventory-items by variant_id (works on your vendor API)
   try {
     const q = await vGET("/vendor/inventory-items", { variant_id: variant.id, limit: 1 })
-    const found = q?.inventory_items?.[0]?.id // should be iitem_*
+    const found = q?.inventory_items?.[0]?.id // iitem_*
     if (found) return found
-  } catch {
-    /* ignore */
-  }
+  } catch { /* ignore */ }
 
   return undefined
 }
+
 
 // 4) Create/Update the level to qty=1
 //    IMPORTANT: Medusa requires the item to be "stocked" at the location BEFORE updates.
 //    So we ALWAYS batch-create first (if missing), then set quantity via per-location update.
 async function createOrUpdateLevelQty1(iitemId: string, locationId: string) {
-  // 1) If level missing, create it via batch (this "stocks" the item at the location)
-  const levelList = await vGET(`/vendor/inventory-items/${iitemId}/location-levels`)
-  const exists = !!levelList?.location_levels?.some((l: any) => l.location_id === locationId)
+  // 0) Log (helps you verify in the server logs)
+  console.log("[seed] ensuring level for", { iitemId, locationId })
 
-  if (!exists) {
+  // 1) Try to create the level via batch no matter what.
+  //    If it already exists, ignore 400/409/etc and continue.
+  try {
     await vPOST(`/vendor/inventory-items/${iitemId}/location-levels/batch`, {
-      // NOTE: singular keys for Medusa v2-style endpoints
       create: [{ location_id: locationId, stocked_quantity: 1 }],
       update: [],
       delete: [],
     })
+    console.log("[seed] batch create level OK")
+  } catch (err: any) {
+    const status = err?.status || err?.code
+    const msg = (err?.message || "").toLowerCase()
+    // Already exists / duplicate / not allowed? Just continue to the update step.
+    if (
+      status === 400 ||
+      status === 409 ||
+      msg.includes("already") ||
+      msg.includes("exists") ||
+      msg.includes("duplicate")
+    ) {
+      console.log("[seed] batch create level skipped (already exists)")
+    } else {
+      console.warn("[seed] batch create level unexpected error → continue anyway", err)
+    }
   }
 
-  // 2) Now it’s stocked there; set (or confirm) qty=1
-  await vPOST(`/vendor/inventory-items/${iitemId}/location-levels/${locationId}`, {
-    stocked_quantity: 1,
-  })
+  // 2) Always set (or confirm) quantity = 1 on that location.
+  //    If the item isn’t stocked there yet, this would have failed before;
+  //    but because we attempted the batch-create first, this should work now.
+  try {
+    await vPOST(`/vendor/inventory-items/${iitemId}/location-levels/${locationId}`, {
+      stocked_quantity: 1,
+    })
+    console.log("[seed] set stocked_quantity=1 OK")
+  } catch (err) {
+    console.error("[seed] set stocked_quantity failed", err)
+    throw err
+  }
 
-  // 3) Invalidate this item's levels so the UI refreshes
+  // 3) Invalidate this item's levels so UI refreshes
   try {
     await queryClient.invalidateQueries({
       queryKey: inventoryItemLevelsQueryKeys.detail(iitemId),
@@ -189,15 +267,24 @@ async function seedInitialStock(productId: string) {
   if (!locationId) return
 
   const variants = await getVariantsWithInvItems(productId)
+
   for (const v of variants) {
     const iitemId = await resolveIItemId(v)
     if (!iitemId) continue
-    await createOrUpdateLevelQty1(iitemId, locationId)
 
-    // Also refresh inventory items lists as a whole
-    await queryClient.invalidateQueries({ queryKey: inventoryItemsQueryKeys.lists() })
+    // 🚫 No attach call at all
+
+    // ✅ Always create/ensure the level and set qty=1
+    await createOrUpdateLevelQty1(iitemId, locationId)
   }
+
+  // Optional cache refresh
+  await queryClient.invalidateQueries({ queryKey: productsQueryKeys.lists() }).catch(() => {})
+  await queryClient.invalidateQueries({ queryKey: productsQueryKeys.detail(productId) }).catch(() => {})
 }
+
+
+
 /**********************************************************************
  *                         CUSTOM CODE END
  *********************************************************************/

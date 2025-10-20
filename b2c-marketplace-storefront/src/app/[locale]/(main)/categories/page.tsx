@@ -1,56 +1,30 @@
-import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
+// app/[locale]/products/page.tsx
 import { Suspense } from "react"
-
 import { Breadcrumbs } from "@/components/atoms"
-//import { AlgoliaProductsListing, ProductListing } from "@/components/sections"
-import { ProductListing } from "@/components/sections"
+import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
+import { ProductListing } from "@/components/sections/ProductListing/ProductListing"
+import { PRODUCT_LIMIT } from "@/const"
 
-import { getRegion } from "@/lib/data/regions"
-
-//const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
-//const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
-
-async function AllCategories({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
-  const { locale } = await params
-
-  const breadcrumbsItems = [
-    {
-      path: "/",
-      label: "All Products",
-    },
-  ]
-
-  const currency_code = (await getRegion(locale))?.currency_code || "usd"
-
-  return (
-    <main className="container">
-      <div className="hidden md:block mb-2">
-        <Breadcrumbs items={breadcrumbsItems} />
-      </div>
-
-      <h1 className="heading-xl uppercase">All Products</h1>
-
-      {/* <Suspense fallback={<ProductListingSkeleton />}>
-        {!ALGOLIA_ID || !ALGOLIA_SEARCH_KEY ? (
-          <ProductListing showSidebar locale={locale} />
-        ) : (
-          <AlgoliaProductsListing
-            locale={locale}
-            currency_code={currency_code}
-          />
-        )}
-      </Suspense> */}
-      <Suspense fallback={<ProductListingSkeleton />}>
-        {/*<ProductListing showSidebar locale={locale} />*/}
-        <ProductListing  locale={locale} />
-      </Suspense>
-
-    </main>
-  )
+type PageProps = {
+    params: { locale: string }
+    searchParams?: { page?: string; limit?: string }
 }
 
-export default AllCategories
+export default async function AllProducts({ params, searchParams }: PageProps) {
+    const { locale } = params
+    const page = Math.max(1, Number(searchParams?.page ?? 1))
+    const pageSize = Math.max(1, Number(searchParams?.limit ?? PRODUCT_LIMIT))
+
+    return (
+        <main className="container">
+            <div className="hidden md:block mb-2">
+                <Breadcrumbs items={[{ path: "/", label: "All Products" }]} />
+            </div>
+            <h1 className="heading-xl uppercase">All Products</h1>
+
+            <Suspense key={`${locale}-${page}-${pageSize}`} fallback={<ProductListingSkeleton />}>
+                <ProductListing locale={locale} page={page} pageSize={pageSize} />
+            </Suspense>
+        </main>
+    )
+}

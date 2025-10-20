@@ -23,6 +23,7 @@ export const ProductDetailsPage = async ({
 
   return (
     <>
+        {/*{JSON.stringify(prod)}*/}
       <div className="flex flex-col md:flex-row lg:gap-12">
         <div className="md:w-1/2 md:px-2">
           <ProductGallery images={prod?.images || []} />
