@@ -32,24 +32,47 @@ export const Hero = ({ image, heading, paragraph, buttons }: HeroProps) => {
         </div>
         {buttons.length && (
           <div className="h-[72px] lg:h-[144px] flex font-bold uppercase">
-            {buttons.map(({ label, path }) => (
-              <LocalizedClientLink
-                key={uuidv4()}
-                href={path}
-                className="group flex border rounded-sm h-full w-1/2 bg-content hover:bg-action hover:text-tertiary transition-all duration-300 p-6 justify-between items-end"
-              >
-                <span>
-                  <span className="group-hover:inline-flex hidden">#</span>
-                  {label}
-                </span>
-
-                <ArrowRightIcon
-                  color={tailwindConfig.theme.extend.backgroundColor.primary}
-                />
-              </LocalizedClientLink>
-            ))}
-          </div>
-        )}
+            {buttons.map(({ label, path }) => {
+                  const isExternal = path.startsWith('http://') || path.startsWith('https://')
+                  
+                  if (isExternal) {
+                    return (
+                      <a
+                        key={uuidv4()}
+                        href={path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex border rounded-sm h-full w-1/2 bg-content hover:bg-action hover:text-tertiary transition-all duration-300 p-6 justify-between items-end"
+                      >
+                        <span>
+                          <span className="group-hover:inline-flex hidden">#</span>
+                          {label}
+                        </span>
+                        <ArrowRightIcon
+                          color={tailwindConfig.theme.extend.backgroundColor.primary}
+                        />
+                      </a>
+                    )
+                  }
+                  
+                  return (
+                    <LocalizedClientLink
+                      key={uuidv4()}
+                      href={path}
+                      className="group flex border rounded-sm h-full w-1/2 bg-content hover:bg-action hover:text-tertiary transition-all duration-300 p-6 justify-between items-end"
+                    >
+                      <span>
+                        <span className="group-hover:inline-flex hidden">#</span>
+                        {label}
+                      </span>
+                      <ArrowRightIcon
+                        color={tailwindConfig.theme.extend.backgroundColor.primary}
+                      />
+                    </LocalizedClientLink>
+                  )
+                })}
+              </div>
+            )}
       </div>
     </section>
   )
