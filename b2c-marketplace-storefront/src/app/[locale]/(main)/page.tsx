@@ -58,6 +58,7 @@ export default async function Home({
               //   ? "https://vendor-sandbox.vercel.app/"
               //   : "https://vendor.Refashionjs.com",
           },
+          {label: "About ReFashion", path: "/about_us"}
         ]}
       />
       <div className="px-4 lg:px-8 w-full">
