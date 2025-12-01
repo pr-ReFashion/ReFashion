@@ -1,53 +1,63 @@
-import { BlogPost } from '@/types/blog';
-import { BlogCard } from '@/components/organisms';
+import Parser from "rss-parser"
+import { BlogCard } from "@/components/organisms"
+import { BlogPost } from "@/types/blog"
 
-export const blogPosts: BlogPost[] = [
-  {
-    id: 1,
-    title: "Summer's Most Elegant Accessories",
-    excerpt:
-      "Discover this season's most sophisticated accessories that blend timeless elegance with modern design.",
-    image: '/images/blog/post-1.jpg',
-    category: 'ACCESSORIES',
-    href: '#',
-  },
-  {
-    id: 2,
-    title: 'The Season’s Hottest Trends',
-    excerpt:
-      'From bold colors to nostalgic silhouettes, explore the must-have looks defining this season’s fashion narrative.',
-    image: '/images/blog/post-2.jpg',
-    category: 'STYLE GUIDE',
-    href: '#',
-  },
-  {
-    id: 3,
-    title: 'Minimalist Outerwear Trends',
-    excerpt:
-      'Explore the latest minimalist outerwear pieces that combine functionality with clean aesthetics.',
-    image: '/images/blog/post-3.jpg',
-    category: 'TRENDS',
-    href: '#',
-  },
-];
+// Helper: extract first image URL from HTML
+function extractImage(html?: string): string | null {
+  if (!html) return null
+  const imgRegex = /<img[^>]+src=["']([^"']+)["']/i
+  const match = html.match(imgRegex)
+  return match ? match[1] : null
+}
 
-export function BlogSection() {
+export async function BlogSection() {
+  const parser = new Parser({
+    customFields: {
+      item: ["content:encoded"],
+    },
+  })
+
+  // Replace with your RSS feed URL
+  const feed = await parser.parseURL("https://www.eco-stylist.com/feed/")
+
+  // Sort items by pubDate descending (newest first)
+  const sortedItems = feed.items
+    .slice()
+    .sort((a, b) => {
+      const dateA = new Date(a.pubDate || 0).getTime()
+      const dateB = new Date(b.pubDate || 0).getTime()
+      return dateB - dateA
+    })
+    .slice(0, 3) // take only 3 latest articles
+
+  const blogPosts: BlogPost[] = sortedItems.map((item, index) => {
+    const enclosureImage = item.enclosure?.url
+    const htmlContent =
+      (item as any)["content:encoded"] || item.content || item.contentSnippet
+    const extractedImage = extractImage(htmlContent)
+    const finalImage = enclosureImage || extractedImage || "/images/blog/default.jpg"
+
+    return {
+      id: index,
+      title: item.title ?? "Untitled",
+      excerpt: item.contentSnippet ?? "",
+      image: finalImage,
+      category: item.categories?.[0] ?? "NEWS",
+      href: item.link ?? "#",
+    }
+  })
+
   return (
-    <section className='bg-tertiary container'>
-      <div className='flex items-center justify-between mb-12'>
-        <h2 className='heading-lg text-tertiary'>
-          STAY UP TO DATE
-        </h2>
+    <section className="bg-tertiary container">
+      <div className="flex items-center justify-between mb-12">
+        <h2 className="heading-lg text-tertiary">STAY UP TO DATE</h2>
       </div>
-      <div className='grid grid-cols-1 lg:grid-cols-3'>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {blogPosts.map((post, index) => (
-          <BlogCard
-            key={post.id}
-            index={index}
-            post={post}
-          />
+          <BlogCard key={post.id} index={index} post={post} />
         ))}
       </div>
     </section>
-  );
+  )
 }

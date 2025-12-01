@@ -8,6 +8,7 @@ import {
   Navbar,
 } from "@/components/cells"
 import { HeartIcon } from "@/icons"
+import { InfoIcon } from "@/icons"
 import { listCategories } from "@/lib/data/categories"
 import { PARENT_CATEGORIES } from "@/const"
 import { retrieveCart } from "@/lib/data/cart"
@@ -68,21 +69,43 @@ export const Header = async () => {
           </LocalizedClientLink>
         </div>
         <div className="flex items-center justify-end gap-2 lg:gap-4 w-full lg:w-1/3 py-2">
-          <UserDropdown user={user} />
-          {user && (
-            <LocalizedClientLink href="/user/wishlist" className="relative">
-              <HeartIcon size={20} />
-              {Boolean(wishlistCount) && (
-                <Badge className="absolute -top-2 -right-2 w-4 h-4 p-0">
-                  {wishlistCount}
-                </Badge>
-              )}
-            </LocalizedClientLink>
-          )}
+  <UserDropdown user={user} />
+  <LocalizedClientLink
+    href="/about_us"
+    className="relative group flex items-center"
+  >
+    <InfoIcon size={20} />
 
-          <CartDropdown cart={cart} />
-          <CountrySelector regions={regions} />
-        </div>
+    
+    <span
+      className="
+        absolute -top-8 left-1/2 -translate-x-1/2
+        whitespace-nowrap text-xs
+        bg-black text-white rounded px-2 py-1
+        opacity-0 group-hover:opacity-100
+        transition-opacity duration-200
+        pointer-events-none
+      "
+    >
+      About ReFashion
+    </span>
+  </LocalizedClientLink>
+
+  {user && (
+    <LocalizedClientLink href="/user/wishlist" className="relative">
+      <HeartIcon size={20} />
+      {Boolean(wishlistCount) && (
+        <Badge className="absolute -top-2 -right-2 w-4 h-4 p-0">
+          {wishlistCount}
+        </Badge>
+      )}
+    </LocalizedClientLink>
+  )}
+
+  <CartDropdown cart={cart} />
+  <CountrySelector regions={regions} />
+</div>
+
       </div>
       <Navbar categories={categories} />
     </header>

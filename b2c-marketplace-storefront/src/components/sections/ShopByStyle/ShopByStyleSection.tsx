@@ -6,28 +6,23 @@ import { Style } from "@/types/styles"
 export const styles: Style[] = [
   {
     id: 1,
-    name: "LUXURY",
-    href: "/collections/luxury",
+    name: "BAGS",
+    href: "/collections/bags",
   },
   {
     id: 2,
-    name: "VINTAGE",
-    href: "/collections/vintage",
+    name: "CLOTHES",
+    href: "/collections/clothes",
   },
   {
     id: 3,
-    name: "CASUAL",
-    href: "/collections/casual",
+    name: "SHOES",
+    href: "/collections/shoes",
   },
   {
     id: 4,
-    name: "STREETWEAR",
-    href: "/collections/streetwear",
-  },
-  {
-    id: 5,
-    name: "Y2K",
-    href: "/collections/y2k",
+    name: "ACCESSORIES",
+    href: "/collections/accessories",
   },
 ]
 

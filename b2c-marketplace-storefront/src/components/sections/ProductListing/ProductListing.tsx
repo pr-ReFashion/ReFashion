@@ -27,24 +27,31 @@ export const ProductListing = async ({
                                          page,
                                          pageSize,
                                      }: Props) => {
-    const offset = (page - 1) * pageSize
+    // Ensure numeric defaults and prevent NaN offset
+    const safePage = Number.isFinite(page) && page > 0 ? page : 1
+    const safePageSize = Number.isFinite(pageSize) && pageSize > 0 ? pageSize : 20
+    const offset = (safePage - 1) * safePageSize
+
 
     const { response } = await listProductsWithSort({
-        seller_id,
-        category_id,
-        collection_id,
-        countryCode: locale,
-        sortBy: "created_at",
-        queryParams: { limit: pageSize, offset },
+    seller_id,
+    category_id,
+    collection_id,
+    countryCode: locale,
+    sortBy: "created_at",
+    queryParams: { limit: safePageSize, offset },
     })
 
-    const { products, count: totalCount } = await response as {
-        products: any[]
-        count?: number
+
+    const { products, count: totalCount } = (await response) as {
+    products: any[]
+    count?: number
     }
 
-    const count = typeof totalCount === "number" ? totalCount : products.length
-    const pages = Math.max(1, Math.ceil(count / pageSize))
+    // Ensure valid numeric count and pagination
+    const count = Number.isFinite(totalCount) ? totalCount : products.length || 0
+    const pages = Math.max(1, Math.ceil(count / safePageSize))
+
 
     return (
         <div className="py-4">

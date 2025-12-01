@@ -1,6 +1,6 @@
-import type { NextConfig } from "next"
+/** @type {import('next').NextConfig} */
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   trailingSlash: false,
   reactStrictMode: true,
   logging: {
@@ -39,6 +39,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "s3.eu-central-1.amazonaws.com",
       },
+      {
+        protocol: "https",
+        hostname: "eztivn6wptm.exactdn.com",
+      }
     ],
   },
 }

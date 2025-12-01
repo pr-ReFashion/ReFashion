@@ -1,19 +1,11 @@
-import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
-import { getCategoryByHandle } from "@/lib/data/categories"
 import { Suspense } from "react"
-
-import type { Metadata } from "next"
-import { generateCategoryMetadata } from "@/lib/helpers/seo"
-import { Breadcrumbs } from "@/components/atoms"
-
-//import { AlgoliaProductsListing, ProductListing } from "@/components/sections"
-import { ProductListing } from "@/components/sections"
-
-
 import { notFound } from "next/navigation"
-
-//const ALGOLIA_ID = process.env.NEXT_PUBLIC_ALGOLIA_ID
-//const ALGOLIA_SEARCH_KEY = process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_KEY
+import type { Metadata } from "next"
+import { ProductListingSkeleton } from "@/components/organisms/ProductListingSkeleton/ProductListingSkeleton"
+import { ProductListing } from "@/components/sections"
+import { Breadcrumbs } from "@/components/atoms"
+import { getCategoryByHandle } from "@/lib/data/categories"
+import { generateCategoryMetadata } from "@/lib/helpers/seo"
 
 export async function generateMetadata({
   params,
@@ -21,8 +13,9 @@ export async function generateMetadata({
   params: Promise<{ category: string }>
 }): Promise<Metadata> {
   const { category } = await params
+  const decodedHandle = decodeURIComponent(category) // 🔥 fix double-encoding
 
-  const cat = await getCategoryByHandle([category])
+  const cat = await getCategoryByHandle([decodedHandle])
 
   return generateCategoryMetadata(cat)
 }
@@ -35,18 +28,19 @@ async function Category({
     locale: string
   }>
 }) {
-  const { category: handle, locale } = await params
+  const { category, locale } = await params
+  const decodedHandle = decodeURIComponent(category) // 🔥 fix double-encoding
 
-  const category = await getCategoryByHandle([handle])
+  const cat = await getCategoryByHandle([decodedHandle])
 
-  if (!category) {
+  if (!cat) {
     return notFound()
   }
 
   const breadcrumbsItems = [
     {
-      path: category?.handle,
-      label: category?.name,
+      path: cat?.handle,
+      label: cat?.name,
     },
   ]
 
@@ -56,19 +50,11 @@ async function Category({
         <Breadcrumbs items={breadcrumbsItems} />
       </div>
 
-      <h1 className="heading-xl uppercase">{category.name}</h1>
+      <h1 className="heading-xl uppercase">{cat.name}</h1>
 
-      {/* <Suspense fallback={<ProductListingSkeleton />}>
-        {!ALGOLIA_ID || !ALGOLIA_SEARCH_KEY ? (
-          <ProductListing category_id={category.id} showSidebar />
-        ) : (
-          <AlgoliaProductsListing category_id={category.id} locale={locale} />
-        )}
-      </Suspense> */}
       <Suspense fallback={<ProductListingSkeleton />}>
-        <ProductListing category_id={category.id} showSidebar />
+        <ProductListing category_id={cat.id} showSidebar />
       </Suspense>
-
     </main>
   )
 }

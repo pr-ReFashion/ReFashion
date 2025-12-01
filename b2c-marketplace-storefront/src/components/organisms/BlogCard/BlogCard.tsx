@@ -11,17 +11,13 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post, index }: BlogCardProps) {
-  return (
-    <LocalizedClientLink
-      href={post.href}
-      className={cn(
-        "group block border border-secondary p-1 rounded-sm relative",
-        index > 0 && "hidden lg:block"
-      )}
-    >
+  const isExternal = post.href.startsWith("http")
+
+  const content = (
+    <>
       <div className="relative overflow-hidden rounded-xs h-full">
         <Image
-          src={decodeURIComponent(post.image)}
+          src={post.image}
           alt={post.title}
           width={467}
           height={472}
@@ -33,13 +29,39 @@ export function BlogCard({ post, index }: BlogCardProps) {
         <h3 className="heading-sm">{post.title}</h3>
         <p className="text-md line-clamp-2">{post.excerpt}</p>
         <div className="flex items-center gap-4 uppercase label-md mt-[26px]">
-          Read more{" "}
-          <ArrowRightIcon
-            size={20}
-            color={tailwindConfig.theme.extend.colors.tertiary}
-          />
+          Read more
+          <ArrowRightIcon size={20} color="#fff" />
         </div>
       </div>
+    </>
+  )
+
+  if (isExternal) {
+    return (
+      <a
+        href={post.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={cn(
+          "group block border border-secondary p-1 rounded-sm relative",
+          index > 0 && "hidden lg:block"
+        )}
+      >
+        {content}
+      </a>
+    )
+  }
+
+  return (
+    <LocalizedClientLink
+      href={post.href}
+      className={cn(
+        "group block border border-secondary p-1 rounded-sm relative",
+        index > 0 && "hidden lg:block"
+      )}
+    >
+      {content}
     </LocalizedClientLink>
   )
 }
+
