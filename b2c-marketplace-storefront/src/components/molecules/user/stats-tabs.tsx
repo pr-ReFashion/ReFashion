@@ -1,9 +1,7 @@
 "use client"
 
-import AchievementCard from "@/components/organisms/AchievementCard/AchievementCard"
 import { useState } from "react"
 import clsx from "clsx"
-import React from "react"
 
 type TabId = "stats" | "tokens" | "impact" | "achievements"
 
@@ -23,7 +21,6 @@ export function StatsTabs() {
             <div className="border-b border-gray-200">
                 <div className="flex flex-wrap gap-2">
                     {TABS.map((tab) => (
-
                         <button
                             key={tab.id}
                             type="button"
@@ -197,106 +194,15 @@ export function StatsTabs() {
                 )}
 
                 {activeTab === "achievements" && (
-    <div>
-        <h2 className="label-md mb-2">Achievements</h2>
-        <p className="mb-4 text-sm text-gray-600">
-            Badges, levels and milestones you've unlocked through your activity.
-        </p>
-
-        <div className="grid gap-4 md:grid-cols-2">
-
-    <AchievementCard
-        title="Welcome to ReFashion"
-        description="Create your account on ReFashion"
-        image="/images/achievements/refashion.png"
-        progress={1}
-        total={1}
-    />                
-
-    <AchievementCard
-        title="First Sale"
-        description="Sell your first item on ReFashion"
-        image="/images/achievements/1st-sell.png"
-        progress={1}
-        total={1}
-    />
-
-    <AchievementCard
-        title="First Purchase"
-        description="Buy your first secondhand item"
-        image="/images/achievements/1st-buy.png"
-        progress={1}
-        total={1}
-    />
-
-    <AchievementCard
-        title="Consistent Seller"
-        description="Complete 5 sales"
-        image="/images/achievements/con-seller.png"
-        progress={4}
-        total={5}
-    />
-
-    <AchievementCard
-        title="Consistent Buyer"
-        description="Complete 5 purchases"
-        image="/images/achievements/con-buyer.png"
-        progress={5}
-        total={5}
-    />
-
-    <AchievementCard
-        title="Super Seller"
-        description="Complete 10 sales"
-        image="/images/achievements/super-seller.png"
-        progress={4}
-        total={10}
-    />
-
-    <AchievementCard
-        title="Super Buyer"
-        description="Complete 10 purchases"
-        image="/images/achievements/super-buyer.png"
-        progress={5}
-        total={10}
-    />
-
-    <AchievementCard
-        title="Vintage Ambassador"
-        description="List 5 vintage items"
-        image="/images/achievements/vintage.png"
-        progress={0}
-        total={5}
-    />
-
-    <AchievementCard
-        title="Personal Impact"
-        description="Reached 5 kg CO2 , 500 Lt water, or 10 kg landfill savings."
-        image="/images/achievements/personal-impact.png"
-        progress={0}
-        total={3}
-    />
-
-    <AchievementCard
-        title="One of a Kind"
-        description="Listed 3 premium items with proof of authenticity and original packaging."
-        image="/images/achievements/one-of-a-kind.png"
-        progress={1}
-        total={3}
-    />
-
-    <AchievementCard
-        title="ReFashion Star"
-        description="Received 50 hearts from fellow fashion lovers."
-        image="/images/achievements/refashion-star.png"
-        progress={50}
-        total={50}
-    />
-
-</div>
-    </div>
-)}
-
+                    <div>
+                        <h2 className="label-md mb-2">Achievements</h2>
+                        <p className="mb-4 text-sm text-gray-600">
+                            Badges, levels and milestones you’ve unlocked through your
+                            activity.
+                        </p>
+                        {/* TODO: πραγματικό περιεχόμενο Achievements */}
+                    </div>
+                )}
             </div>
         </div>
     )
@@ -418,6 +324,3 @@ function AchievementsIcon({ className }: { className?: string }) {
         </svg>
     )
 }
-
-
-

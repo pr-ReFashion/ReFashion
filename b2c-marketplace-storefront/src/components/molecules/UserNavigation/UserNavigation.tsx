@@ -10,6 +10,10 @@ const navigationItems = [
     label: "Addresses",
     href: "/user/addresses",
   },
+    {
+        label: "Stats",
+        href: "/user/stats",
+    },
   {
         label: "Stats",
         href: "/user/stats",
