@@ -1,7 +1,6 @@
 "use client"
 import { Card, Divider, LogoutButton, NavigationItem } from "@/components/atoms"
 import { usePathname } from "next/navigation"
-
 const navigationItems = [
   {
     label: "Orders",
@@ -12,6 +11,10 @@ const navigationItems = [
     href: "/user/addresses",
   },
   {
+        label: "Stats",
+        href: "/user/stats",
+  },
+  {
     label: "Reviews",
     href: "/user/reviews",
   },
@@ -20,10 +23,8 @@ const navigationItems = [
     href: "/user/wishlist",
   },
 ]
-
 export const UserNavigation = () => {
   const path = usePathname()
-
   return (
     <Card className="h-min">
       {navigationItems.map((item) => (
