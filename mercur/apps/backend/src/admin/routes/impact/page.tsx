@@ -31,24 +31,14 @@ function LandfillIcon({ className }: { className?: string }) {
   )
 }
 
-/* ---------- Register page (adds left menu entry) ---------- */
+/* ---------- Register left menu entry ---------- */
 export const config = defineRouteConfig({
   label: "Impact Overview",
   icon: (props: any) => <CO2Icon className={clx("size-4", props?.className)} />,
 })
 
 /* ---------- Small stat card ---------- */
-function Stat({
-  icon,
-  value,
-  unit,
-  label,
-}: {
-  icon: React.ReactNode
-  value: string
-  unit?: string
-  label: string
-}) {
+function Stat({ icon, value, unit, label }: { icon: React.ReactNode; value: string; unit?: string; label: string }) {
   return (
     <div className="rounded-md border bg-ui-bg-base p-4">
       <div className="flex items-center gap-3">
@@ -66,15 +56,47 @@ function Stat({
   )
 }
 
-/* ---------- Page ---------- */
-type Totals = {
-  co2_kg: number
-  water_liters: number
-  landfill_kg: number
+/* ---------- Tiny line chart (no extra deps) ---------- */
+function MiniLine({
+  data,
+  height = 90,
+  strokeWidth = 2,
+  className,
+}: {
+  data: number[]
+  height?: number
+  strokeWidth?: number
+  className?: string
+}) {
+  const width = 260 // card friendly
+  const path = useMemo(() => {
+    if (!data.length) return ""
+    const max = Math.max(...data, 0)
+    const min = Math.min(...data, 0)
+    const range = Math.max(max - min, 1)
+
+    const toX = (i: number) => (i / Math.max(data.length - 1, 1)) * (width - 6) + 3
+    const toY = (v: number) => height - 6 - ((v - min) / range) * (height - 12)
+
+    let d = `M ${toX(0)} ${toY(data[0])}`
+    for (let i = 1; i < data.length; i++) d += ` L ${toX(i)} ${toY(data[i])}`
+    return d
+  }, [data, height])
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} className={className}>
+      <path d={path} fill="none" stroke="currentColor" strokeWidth={strokeWidth} />
+    </svg>
+  )
 }
+
+/* ---------- Page ---------- */
+type Totals = { co2_kg: number; water_liters: number; landfill_kg: number }
+type Point = { date: string; co2: number; water: number; landfill: number; co2_cum: number; water_cum: number; landfill_cum: number }
 
 export default function ImpactPage() {
   const [totals, setTotals] = useState<Totals>({ co2_kg: 0, water_liters: 0, landfill_kg: 0 })
+  const [series, setSeries] = useState<Point[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -85,19 +107,26 @@ export default function ImpactPage() {
         setError(null)
         setLoading(true)
 
-        const res = await fetch("/admin/impact/summary", { credentials: "include" })
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`)
-        const data = await res.json()
+        const [sumRes, tsRes] = await Promise.all([
+          fetch("/admin/impact/summary", { credentials: "include" }),
+          fetch("/admin/impact/timeseries?granularity=day", { credentials: "include" }),
+        ])
+        if (!sumRes.ok) throw new Error(`Summary failed: ${sumRes.status}`)
+        if (!tsRes.ok) throw new Error(`Timeseries failed: ${tsRes.status}`)
+
+        const sum = await sumRes.json()
+        const ts = await tsRes.json()
 
         if (!abort) {
           setTotals({
-            co2_kg: Number(data?.co2_saved_kg_total ?? 0),
-            water_liters: Number(data?.water_saved_liters_total ?? 0),
-            landfill_kg: Number(data?.landfill_reduced_kg_total ?? 0),
+            co2_kg: Number(sum?.co2_saved_kg_total ?? 0),
+            water_liters: Number(sum?.water_saved_liters_total ?? 0),
+            landfill_kg: Number(sum?.landfill_reduced_kg_total ?? 0),
           })
+          setSeries((ts?.series ?? []) as Point[])
         }
       } catch (e: any) {
-        if (!abort) setError(e?.message ?? "Failed to load totals")
+        if (!abort) setError(e?.message ?? "Failed to load data")
       } finally {
         if (!abort) setLoading(false)
       }
@@ -106,14 +135,9 @@ export default function ImpactPage() {
   }, [])
 
   const formatted = useMemo(() => {
-    const fmt1 = (n: number) =>
-      new Intl.NumberFormat(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1 }).format(n)
+    const fmt1 = (n: number) => new Intl.NumberFormat(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1 }).format(n)
     const fmt0 = (n: number) => new Intl.NumberFormat().format(Math.round(n))
-    return {
-      co2: fmt1(totals.co2_kg),
-      water: fmt0(totals.water_liters),
-      landfill: fmt1(totals.landfill_kg),
-    }
+    return { co2: fmt1(totals.co2_kg), water: fmt0(totals.water_liters), landfill: fmt1(totals.landfill_kg) }
   }, [totals])
 
   return (
@@ -126,15 +150,28 @@ export default function ImpactPage() {
         </div>
       )}
 
-      {loading ? (
-        <Text>Loading impact numbers…</Text>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Stat icon={<CO2Icon className="size-6" />} value={formatted.co2} unit="kg" label="CO₂ saved" />
-          <Stat icon={<WaterIcon className="size-6" />} value={formatted.water} unit="lt" label="Water saved" />
-          <Stat icon={<LandfillIcon className="size-6" />} value={formatted.landfill} unit="kg" label="Landfill reduced" />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Stat icon={<CO2Icon className="size-6" />} value={formatted.co2} unit="kg" label="CO₂ saved" />
+        <Stat icon={<WaterIcon className="size-6" />} value={formatted.water} unit="lt" label="Water saved" />
+        <Stat icon={<LandfillIcon className="size-6" />} value={formatted.landfill} unit="kg" label="Landfill reduced" />
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="rounded-md border p-4">
+          <div className="mb-2 flex items-center gap-2 text-ui-fg-muted"><CO2Icon className="size-4" /><Text size="small">CO₂ over time (daily cumulative)</Text></div>
+          <MiniLine data={series.map((p) => p.co2_cum)} />
         </div>
-      )}
+        <div className="rounded-md border p-4">
+          <div className="mb-2 flex items-center gap-2 text-ui-fg-muted"><WaterIcon className="size-4" /><Text size="small">Water over time (daily cumulative)</Text></div>
+          <MiniLine data={series.map((p) => p.water_cum)} />
+        </div>
+        <div className="rounded-md border p-4">
+          <div className="mb-2 flex items-center gap-2 text-ui-fg-muted"><LandfillIcon className="size-4" /><Text size="small">Landfill over time (daily cumulative)</Text></div>
+          <MiniLine data={series.map((p) => p.landfill_cum)} />
+        </div>
+      </div>
+
+      {loading && <div className="mt-4 text-ui-fg-subtle text-sm">Loading…</div>}
     </div>
   )
 }
