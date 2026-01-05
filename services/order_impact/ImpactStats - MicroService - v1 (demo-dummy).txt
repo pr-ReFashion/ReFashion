@@ -1,0 +1,32 @@
+
+
+1) Micro-service (dummy impact calculator) // this will be replaced when partners bring their own.
+
+Path: C:\Projects\Refashion\services\order_impact\main.py
+
+
+Run locally (Windows PowerShell/CMD):
+cd C:\Projects\Refashion\services\order_impact
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --host 127.0.0.1 --port 9200 --reload
+
+Health check: GET http://127.0.0.1:9200/health → {"service":"order-impact","status":"ok"}
+This service is localhost-only (bound to 127.0.0.1), so nothing external can hit it.
+
+
+2) Backend config (tell Medusa where the service lives)
+Add to apps/backend/.env:
+IMPACT_SVC_URL=http://127.0.0.1:9200
+
+
+
+3) Subscriber: call the micro-service on order placed, update the customer
+
+3.0) Install pg (once, at repo root)
+cd C:\Projects\Refashion\mercur
+yarn add -W pg
+
+3.1)
+C:\Projects\Refashion\mercur\apps\backend\src\subscribers\order-impact.ts
