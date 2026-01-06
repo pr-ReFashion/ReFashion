@@ -3,7 +3,7 @@ import http from "http"
 import { URL } from "url"
 
 const TARGET = "http://127.0.0.1:11434/api/llm"
-const INTERNAL_TOKEN = process.env.LLM_INTERNAL_TOKEN!
+
 
 export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   try {
@@ -17,7 +17,6 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
         path: url.pathname,
         headers: {
           "content-type": "application/json",
-          "x-internal-token": INTERNAL_TOKEN,
         },
       },
       (proxyRes) => {
@@ -30,11 +29,11 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     )
 
     proxyReq.on("error", () => {
-      res.status(502).json({ message: "LLM proxy error" })
+      res.status(502).json({ message: "Ollama proxy error" })
     })
 
     req.pipe(proxyReq)
-  } catch (e: any) {
-    res.status(500).json({ message: e?.message ?? "LLM proxy failed" })
+  } catch (err: any) {
+    res.status(500).json({ message: err?.message ?? "Proxy failed" })
   }
 }
