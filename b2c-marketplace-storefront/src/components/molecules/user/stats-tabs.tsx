@@ -5,10 +5,10 @@ import { useState, useEffect } from "react"
 import clsx from "clsx"
 import React from "react"
 import { retrieveCustomer } from "@/lib/data/customer"
-import { getProductCountByEmail } from "@/lib/data/achievements"
 import { getTokens } from "@/lib/data/tokens"
 import { getUserImpactByEmail, UserImpact } from "@/lib/data/impact"
-
+import { getPurchasesByEmail } from "@/lib/data/purchase"
+import { getSalesByEmail } from "@/lib/data/sales"
 
 type TabId = "stats" | "tokens" | "impact" | "achievements"
 
@@ -21,31 +21,36 @@ const TABS: { id: TabId; label: string }[] = [
 
 export function StatsTabs() {
   const [activeTab, setActiveTab] = useState<TabId>("stats")
-  const [productCount, setProductCount] = useState<number>(0)
+  const [purchaseCount, setPurchaseCount] = useState<number>(0)
   const [tokens, setTokens] = useState<number>(0)
+  const [salesCount, setSalesCount] = useState<number>(0)
   const [userImpact, setUserImpact] = useState<UserImpact>({
     co2_saved_kg: 0,
     landfill_reduced_kg: 0,
     water_saved_liters: 0,
   })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const user = await retrieveCustomer()
-      if (!user) return
+useEffect(() => {
+  const fetchData = async () => {
+    const user = await retrieveCustomer()
+    if (!user) return
 
-      const { count } = await getProductCountByEmail(user.email)
-      setProductCount(count)
+    const userTokens = await getTokens(user.email)
+    setTokens(userTokens)
 
-      const userTokens = await getTokens(user.email)
-      setTokens(userTokens)
+    const impact = await getUserImpactByEmail(user.email)
+    setUserImpact(impact)
 
-      const impact = await getUserImpactByEmail(user.email)
-      setUserImpact(impact)
-    }
+    const purchases = await getPurchasesByEmail(user.email)
+    setPurchaseCount(purchases)
 
-    fetchData()
-  }, [])
+    const sales = await getSalesByEmail(user.email)
+    setSalesCount(sales)
+  }
+
+  fetchData()
+}, [])
+
 
   const achievements = [
     {
@@ -59,42 +64,42 @@ export function StatsTabs() {
       title: "First Sale",
       description: "Sell your first item on ReFashion",
       image: "/images/achievements/1st-sell.png",
-      progress: 1,
+      progress: Math.min(salesCount,1),
       total: 1,
     },
     {
       title: "First Purchase",
       description: "Buy your first secondhand item",
       image: "/images/achievements/1st-buy.png",
-      progress: 1,
+      progress: Math.min(purchaseCount,1),
       total: 1,
     },
     {
       title: "Consistent Seller",
       description: "Complete 5 sales",
       image: "/images/achievements/con-seller.png",
-      progress: productCount,
+      progress: Math.min(salesCount,5),
       total: 5,
     },
     {
       title: "Consistent Buyer",
       description: "Complete 5 purchases",
       image: "/images/achievements/con-buyer.png",
-      progress: 5,
+      progress: Math.min(purchaseCount,5),
       total: 5,
     },
     {
       title: "Super Seller",
       description: "Complete 10 sales",
       image: "/images/achievements/super-seller.png",
-      progress: productCount,
+      progress: Math.min(salesCount,10),
       total: 10,
     },
     {
       title: "Super Buyer",
       description: "Complete 10 purchases",
       image: "/images/achievements/super-buyer.png",
-      progress: 5,
+      progress: Math.min(purchaseCount,10),
       total: 10,
     },
     {
