@@ -1,0 +1,75 @@
+C:\Projects\Refashion\
+  apps\
+    backend\              ← Medusa backend (port 9000)
+      src\
+        api\
+          imageprocess\
+            route.ts      ← the proxy endpoint (the /imageprocess)
+  services\
+    imageproc\            ← the FastAPI micro-service (port 9100)
+      main.py
+      requirements.txt
+      test.jpg            ← only a sample file
+
+
+Call the backend route:
+	- POST http://localhost:9000/imageprocess
+	- Body: multipart/form-data
+	- Field name: file
+	- Value: the image file (e.g. .jpg, .png)
+The backend will proxy to 127.0.0.1:9100/api/imageprocess internally.
+
+
+1) FastAPI microservice (echoes image)
+We create a new folder with:
+services/imageproc/main.py
+services/imageproc/requirements.txt
+
+ - Run it (localhost only)
+cd C:\Projects\Refashion\
+cd services/imageproc
+python -m venv .venv && . .venv/Scripts/activate  # (Windows) or source .venv/bin/activate (macOS/Linux)
+For PowerShell:
+python -m venv .venv; .\.venv\Scripts\Activate.ps1
+
+pip install -r requirements.txt
+
+# Bind to 127.0.0.1 so it's NOT accessible externally
+uvicorn main:app --host 127.0.0.1 --port 9100 --reload
+
+Health check: GET http://127.0.0.1:9100/health
+Echo image: POST http://127.0.0.1:9100/api/imageprocess (multipart file)
+
+
+2) Backend proxy route (Refashion → FastAPI)
+We add a streaming proxy so the UI can call the microservice under the same origin:
+apps/backend/src/api/imageprocess/route.ts
+
+--- Tests ----
+
+- Easy test:
+Open:
+http://127.0.0.1:9100/docs
+Expand POST /api/imageprocess
+Click Try it out
+Click Choose File (this is where you add the image)
+
+- curl tests:
+cd services/imageproc
+
+curl.exe -X POST http://127.0.0.1:9100/api/imageprocess -F "file=@.\test.jpg" --output echoed.jpg
+
+Test the proxy path (port 9000):
+
+
+cd C:\Projects\Refashion\services\imageproc
+curl.exe -X POST "http://localhost:9000/imageprocess" -F "file=@.\test2.jpg" --output no_bg_proxy.png
+
+
+
+
+
+
+
+
+
