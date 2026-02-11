@@ -1,0 +1,110 @@
+C:\Projects\Refashion\
+  apps\
+    backend\              ← Refashion backend (port 9000)
+      src\
+        api\
+          visualsearch\
+            route.ts      ← the proxy endpoint
+  services\
+    visualsearch\            ← the FastAPI micro-service (port 9300)
+      main.py
+      requirements.txt
+      test.jpg            ...
+      test2.jpg           ← sample files
+
+
+1) Micro-service (FastAPI + Selenium)
+
+Folder: services/visualsearch/
+
+// We need firefox installed.
+
+
+----> Install and Run micro-service:
+// open terminal in:
+cd C:\Projects\Refashion\services\visualsearch
+
+# rebuild clean venv (important after pytineye)
+if (Test-Path .venv) { Remove-Item -Recurse -Force .venv }
+py -3 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+// optional
+$env:VIS_BROWSER="firefox"
+$env:HEADLESS="false"
+$env:VIS_DEBUG="true"
+$env:PERSIST_PROFILE="true"
+// optional
+
+python main.py
+# ---> service runs on http://127.0.0.1:9300
+
+// if want to re-run micro-service, then just run:
+.\.venv\Scripts\Activate.ps1
+python main.py
+
+----> 1st Test:
+// we will read a <test.jpg> image in \services\visualsearch and output crawled texts from web.
+// open another terminal in same path and run:
+curl.exe -X POST "http://127.0.0.1:9300/visual-search?provider=bing&scrape=true&max_results=3" -F "file=@test.jpg"
+
+
+--> Response (JSON):
+{
+  "provider": "bing",
+  "results": [
+    {
+      "source": "bing_links",
+      "url": "https://example.com/page-with-similar-image",
+      "title": "Human-readable title if available",
+      "image_thumb": "https://tse1.mm.bing.net/...."  // may be empty or omitted based on provider
+    }
+  ],
+  "insights": [
+    {
+      "source": "bing_insights",
+      "url": "https://example.com/related",
+      "title": "Related/insight title",
+      "image_thumb": "https://tse1.mm.bing.net/...."
+    }
+  ],
+  "scraped": [
+    {
+      "url": "https://example.com/page-with-similar-image",
+      "text": "Plain text extracted from the page"
+    }
+  ],
+  "looks_like":"Tropical Beach With Palm Trees",
+  "error": null
+}
+// The most usefull info, seems to be the "looks_like".
+
+2) Backend proxy route (Refashion → API)
+// We add a streaming proxy so the UI can call the microservice under the same Refashion origin:
+apps/backend/src/api/visualsearch/route.ts
+
+// This mirrors the /imageprocess pattern: frontend only talks to http://localhost:9000/visualsearch. 
+
+----> 2nd Test (same as before, but now we call via Refashion backend proxy):
+# Proxying to the micro-service:
+curl.exe -X POST "http://localhost:9000/visualsearch?provider=bing&scrape=true&max_results=3" -F "file=@.\test.jpg"
+
+
+
+---------------- Endpoint (via backend proxy) ----------------
+POST /visualsearch?provider=bing&scrape=true&max_results=3
+Content-Type: multipart/form-data
+Form field: file (the image file)
+// we can adjust max_results from 1 to 10.
+--------------------------------------------------------------
+
+
+
+
+
+
+
+
