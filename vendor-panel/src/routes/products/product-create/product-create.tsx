@@ -3,7 +3,7 @@ import { RouteFocusModal } from "../../../components/modals"
 import { useMe, useSalesChannels } from "../../../hooks/api"
 import { useStore } from "../../../hooks/api/store"
 import { ProductCreateForm } from "./components/product-create-form/product-create-form"
-import { ProductCreateError } from "./components/product-create-form/product -create-error"
+import { ProductCreateError } from "./components/product-create-form/product-create-error"
 
 
 
