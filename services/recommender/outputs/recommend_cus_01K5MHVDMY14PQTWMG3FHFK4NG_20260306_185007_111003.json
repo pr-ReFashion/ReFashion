@@ -1,0 +1,52 @@
+{
+    "input_customer_id":  "cus_01K5MHVDMY14PQTWMG3FHFK4NG",
+    "input_age":  29,
+    "neighbor_count":  3,
+    "product_count":  1,
+    "neighbors":  [
+        {
+            "customer_id":  "cus_01KK274ZVARJ18PVYF02CNHF1N",
+            "age":  28,
+            "age_diff_days":  365,
+            "date_of_birth":  "1997-03-21",
+            "first_name":  "John",
+            "last_name":  "John",
+            "email":  "John@hotmail.com",
+            "job":  "Programmer",
+            "interests":  "Sky diving, jogging, walking"
+        },
+        {
+            "customer_id":  "cus_01K5M18FJ5PG5GFFVVR7729NYZ",
+            "age":  26,
+            "age_diff_days":  1095,
+            "date_of_birth":  "1999-03-21",
+            "first_name":  "HH",
+            "last_name":  "HH",
+            "email":  "buyer3@test.com",
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        },
+        {
+            "customer_id":  "cus_01K5FCSEF61KVQYG5SB417M1X9",
+            "age":  25,
+            "age_diff_days":  1461,
+            "date_of_birth":  "2000-03-21",
+            "first_name":  null,
+            "last_name":  null,
+            "email":  "buyer@test.com",
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        }
+    ],
+    "neighbor_products":  [
+        {
+            "neighbor_customer_id":  "cus_01KK274ZVARJ18PVYF02CNHF1N",
+            "product_id":  "prod_01K0FRTKW4HH8GW2VV0MSAFYNS",
+            "order_id":  "order_01KK27NH6C6ZTZVKE3EJAR1CNJ",
+            "order_line_item_id":  "ordli_01KK27NH6DE3B4M8GP6494NZ7K"
+        }
+    ],
+    "recommended_product_ids":  [
+        "prod_01K0FRTKW4HH8GW2VV0MSAFYNS"
+    ]
+}

@@ -1,0 +1,62 @@
+{
+    "entity":  "customer",
+    "min_age":  18,
+    "max_age":  30,
+    "limit":  10,
+    "offset":  0,
+    "count":  4,
+    "items":  [
+        {
+            "entity":  "customer",
+            "id":  "cus_01K953YYTWG83C313TB515Q1XX",
+            "age":  20,
+            "date_of_birth":  "2005-03-21",
+            "first_name":  "test446",
+            "last_name":  "test446",
+            "email":  "test446@hotmail.com",
+            "name":  null,
+            "handle":  null,
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        },
+        {
+            "entity":  "customer",
+            "id":  "cus_01K5FCSEF61KVQYG5SB417M1X9",
+            "age":  25,
+            "date_of_birth":  "2000-03-21",
+            "first_name":  null,
+            "last_name":  null,
+            "email":  "buyer@test.com",
+            "name":  null,
+            "handle":  null,
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        },
+        {
+            "entity":  "customer",
+            "id":  "cus_01K5M18FJ5PG5GFFVVR7729NYZ",
+            "age":  26,
+            "date_of_birth":  "1999-03-21",
+            "first_name":  "HH",
+            "last_name":  "HH",
+            "email":  "buyer3@test.com",
+            "name":  null,
+            "handle":  null,
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        },
+        {
+            "entity":  "customer",
+            "id":  "cus_01K5MHVDMY14PQTWMG3FHFK4NG",
+            "age":  29,
+            "date_of_birth":  "1996-03-21",
+            "first_name":  "buyer5",
+            "last_name":  "buyer5",
+            "email":  "buyer5@test.com",
+            "name":  null,
+            "handle":  null,
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        }
+    ]
+}

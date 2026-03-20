@@ -1,0 +1,43 @@
+{
+    "input_customer_id":  "cus_01K953YYTWG83C313TB515Q1XX",
+    "input_age":  20,
+    "neighbor_count":  3,
+    "product_count":  0,
+    "neighbors":  [
+        {
+            "customer_id":  "cus_01K5FCSEF61KVQYG5SB417M1X9",
+            "age":  25,
+            "age_diff_days":  1826,
+            "date_of_birth":  "2000-03-21",
+            "first_name":  null,
+            "last_name":  null,
+            "email":  "buyer@test.com",
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        },
+        {
+            "customer_id":  "cus_01K5M18FJ5PG5GFFVVR7729NYZ",
+            "age":  26,
+            "age_diff_days":  2192,
+            "date_of_birth":  "1999-03-21",
+            "first_name":  "HH",
+            "last_name":  "HH",
+            "email":  "buyer3@test.com",
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        },
+        {
+            "customer_id":  "cus_01K5M5BZQPA7JTFV4NPMDKJ065",
+            "age":  13,
+            "age_diff_days":  2557,
+            "date_of_birth":  "2012-03-21",
+            "first_name":  "Alice",
+            "last_name":  "Doe",
+            "email":  "buyer4@test.com",
+            "job":  "Designer",
+            "interests":  "Vintage fashion, sustainability, streetwear"
+        }
+    ],
+    "neighbor_products":  [],
+    "recommended_product_ids":  []
+}

@@ -1,0 +1,49 @@
+
+
+1) Folder structure
+C:\Projects\Refashion\
+  services\
+    recommender\
+      main.py
+      requirements.txt
+2) services/recommender/requirements.txt
+3) services/recommender/main.py
+4) Run (Linux server)
+-----------------
+cd ~/Refashion/services/recommender
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --host 127.0.0.1 --port 9400 --reload
+-----------------------
+(local - windows)
+----------------
+cd C:\Projects\Refashion\services\recommender
+python -m venv .venv; .\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+
+# Bind to 127.0.0.1 so it's NOT accessible externally
+uvicorn main:app --host 127.0.0.1 --port 9400 --reload
+-------------------
+
+
+
+Integration flow:
+Given an input user, 
+---> we find from "customer" table, the closest customers ids based on 'age' feature
+---> then from "order" table we find the order ids for the corresponding customers ids  
+---> then from "order_item" we find the item_id  
+---> then from "order_line_item" we find the "product_id" 
+---> and finally we output the given input user id paired with the product ids found (recomended products).
+
+
+--> Backend proxy route
+apps/backend/src/api/recommend/route.ts
+
+ENDPOINT --->
+Invoke-RestMethod -Uri "http://localhost:9000/recommend?customer_id=cus_01K5MHVDMY14PQTWMG3FHFK4NG&neighbor_limit=4&product_limit=3" -Method GET -Headers @{ "x-api-key" = "my-super-secret-code" } | ConvertTo-Json -Depth 10
+
+
+
+
