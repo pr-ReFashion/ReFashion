@@ -15,9 +15,26 @@ export class Migration20250916_AddRewardColumns extends Migration {
     `);
 
     this.addSql(`
-      UPDATE public.seller
-         SET total_rewards = COALESCE(total_rewards, 0) + COALESCE(reward_points, 0)
-       WHERE COALESCE(reward_points, 0) > 0;
+      ALTER TABLE public.seller
+      ADD COLUMN IF NOT EXISTS reward_points integer NOT NULL DEFAULT 0;
+    `);
+
+    this.addSql(`
+      DO $$
+      BEGIN
+        IF EXISTS (
+          SELECT 1
+          FROM information_schema.columns
+          WHERE table_schema = 'public'
+            AND table_name = 'seller'
+            AND column_name = 'reward_points'
+        ) THEN
+          UPDATE public.seller
+             SET total_rewards = COALESCE(total_rewards, 0) + COALESCE(reward_points, 0)
+           WHERE COALESCE(reward_points, 0) > 0;
+        END IF;
+      END
+      $$;
     `);
 
     // ORDER: προσοχή στα quotes

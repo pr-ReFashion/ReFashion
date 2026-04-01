@@ -15,6 +15,8 @@
   "scripts": {
     "build": "medusa build && symlink-dir .medusa/server/public public",
     "seed": "medusa exec ./src/scripts/seed.ts",
+    "seed:100-products": "medusa exec ./src/scripts/seed-100-products.ts 100",
+    "seed:rollback-products": "medusa exec ./src/scripts/rollback-seeded-products.ts",
     "start": "medusa start --types=false",
     "dev": "medusa develop --types=false",
     "db:migrate": "medusa db:migrate",
