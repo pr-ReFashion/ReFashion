@@ -1,4 +1,4 @@
-import { MiddlewareRoute } from '@medusajs/framework'
+import { MiddlewareRoute, authenticate } from '@medusajs/framework'
 
 import { attributeMiddlewares } from './attributes/middlewares'
 import { commissionMiddlewares } from './commission/middlewares'
@@ -11,6 +11,11 @@ import { reviewsMiddlewares } from './reviews/middlewares'
 import { sellerMiddlewares } from './sellers/middlewares'
 
 export const adminMiddlewares: MiddlewareRoute[] = [
+  {
+    matcher: '/admin/customers/*/force-delete',
+    middlewares: [authenticate('user', ['api-key'])],
+  },
+
   ...orderSetsMiddlewares,
   ...requestsMiddlewares,
   ...configurationMiddleware,
@@ -19,5 +24,5 @@ export const adminMiddlewares: MiddlewareRoute[] = [
   ...sellerMiddlewares,
   ...reviewsMiddlewares,
   ...attributeMiddlewares,
-  ...adminProductsMiddlewares
+  ...adminProductsMiddlewares,
 ]
