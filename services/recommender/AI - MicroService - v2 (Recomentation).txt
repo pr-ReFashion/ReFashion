@@ -1,5 +1,3 @@
-
-
 1) Folder structure
 C:\Projects\Refashion\
   services\
@@ -44,6 +42,32 @@ apps/backend/src/api/recommend/route.ts
 ENDPOINT --->
 Invoke-RestMethod -Uri "http://localhost:9000/recommend?customer_id=cus_01K5MHVDMY14PQTWMG3FHFK4NG&neighbor_limit=4&product_limit=3" -Method GET -Headers @{ "x-api-key" = "my-super-secret-code" } | ConvertTo-Json -Depth 10
 
+
+
+--------------- V3 ---------------------
+Recommender microservice — automatic daily filling
+
+new:
+services/recommender/main.py
+---> scheduler + update όλου του customer table
+
+Όταν τρέχει το microservice:
+σε startup μπορεί να τρέξει μία φορά
+μετά κάθε 86400 sec (= 1 μέρα)
+θα ενημερώνει για κάθε customer:
+rec_product_id1
+rec_product_id2
+rec_product_id3
+
+
+δεύτερο proxy route για stop
+apps/backend/src/api/recommend/stop/route.ts
+
+start trigger + recommendation
+Invoke-RestMethod -Uri "http://localhost:9000/recommend?neighbor_limit=4&product_limit=3&refresh_seconds=10" -Method GET -Headers @{ "x-api-key" = "my-super-secret-code" }
+86400
+stop trigger
+Invoke-RestMethod -Uri "http://localhost:9000/recommend/stop" -Method POST -Headers @{ "x-api-key" = "my-super-secret-code" }
 
 
 
