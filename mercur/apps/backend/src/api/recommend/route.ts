@@ -2,7 +2,7 @@ import type { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
 import http from "http"
 import { URL } from "url"
 
-const TARGET = "http://127.0.0.1:9400/recommend/closest-products"
+const TARGET = "http://127.0.0.1:9400/recommend/trigger/start"
 const API_KEY = "my-super-secret-code" // προσωρινά. μετά βάλε το σε env.
 
 export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
