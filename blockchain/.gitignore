@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# Blockchain / Hardhat / Foundry artifacts
+artifacts/
+cache/
+
+# OS files
+.DS_Store
+
+# Logs
+logs/
+*.log

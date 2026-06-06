@@ -5,6 +5,8 @@
 - 🛒 **b2c-marketplace-storefront** – Next.js customer storefront
 - 🧑‍💼 **vendor-panel** – Vendor admin dashboard
 - 🔧 **mercur** – Medusa.js backend API
+- 📱 **mobile-app** – Flutter mobile application
+- 🪙 **blockchain** – ReFashion reward smart contract and API
 
 ---
 
@@ -15,6 +17,8 @@ Refashion/
 ├── mercur/                     # Refashion backend
 ├── vendor-panel/               # Vendor admin panel
 ├── b2c-marketplace-storefront/ # Customer-facing frontend
+├── mobile-app/                 # Flutter mobile app
+├── blockchain/                 # Reward smart contract and API
 ```
 
 ---
